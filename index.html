@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aria's Birthday Party 邀請函</title>
+<style>
+  :root{
+    --blue-light:#cfe8f7;
+    --blue-mid:#a9d8f2;
+    --blue-deep:#5b8fb0;
+    --yellow:#ffc800;
+    --yellow-light:#ffe066;
+    --ink:#2b3a4a;
+    --white:#fffdf7;
+    --danger:#e0554f;
+    --radius:18px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+    color:var(--ink);
+    background:var(--blue-light);
+    -webkit-tap-highlight-color:transparent;
+  }
+  html{scroll-padding-top:var(--safe-top);}
+  button{font-family:inherit;}
+  #app{
+    position:relative;
+    width:100%;
+    height:100dvh;
+    overflow:hidden;
+    background:var(--blue-light);
+  }
+  #pages-wrapper{
+    display:flex;
+    height:100%;
+    width:700%;
+    transition:transform .45s cubic-bezier(.65,0,.35,1);
+  }
+  .page{
+    width:calc(100% / 7);
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+    padding-top:var(--safe-top);
+    padding-bottom:calc(var(--safe-bottom) + 24px);
+  }
+
+  /* ---------- progress bar ---------- */
+  #progress{
+    position:fixed;
+    top:var(--safe-top);
+    left:0;right:0;
+    height:6px;
+    background:rgba(255,255,255,.5);
+    z-index:50;
+    display:none;
+  }
+  #progress-fill{
+    height:100%;
+    background:var(--yellow);
+    width:0%;
+    transition:width .4s ease;
+  }
+  body.show-progress #progress{display:block;}
+
+  /* ---------- page 1 : poster ---------- */
+  .poster-page{padding:0!important;height:100%;}
+  .poster-img{
+    width:100%;height:100%;
+    object-fit:cover;object-position:center top;
+    display:block;
+  }
+  .poster-next{
+    position:absolute;
+    right:18px;
+    bottom:calc(24px + var(--safe-bottom));
+    z-index:5;
+    width:52px;height:52px;
+    padding:0;
+    border-radius:50%;
+    font-size:22px;
+  }
+
+  /* ---------- content pages ---------- */
+  .content-page{
+    background-image:url('images/background.png');
+    background-size:cover;
+    background-position:center;
+    min-height:100%;
+  }
+  .card-wrap{
+    padding:28px 18px 20px;
+    max-width:560px;
+    margin:0 auto;
+  }
+  .paper-card{
+    background:none;
+    box-shadow:none;
+    border-radius:0;
+    padding:0;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .paper-card + .paper-card{
+    border-top:1.5px dashed var(--blue-mid);
+    padding-top:20px;
+  }
+  .paper-card h3{
+    margin:0 0 10px;
+    font-size:17px;
+    color:var(--blue-deep);
+  }
+  .paper-card p{
+    margin:0 0 8px;
+    font-size:14.5px;
+    line-height:1.7;
+    white-space:pre-line;
+  }
+  .info-row{
+    display:flex;
+    gap:8px;
+    font-size:14.5px;
+    line-height:1.7;
+    margin-bottom:6px;
+  }
+  .info-row .label{
+    flex:0 0 auto;
+    font-weight:700;
+    color:var(--blue-deep);
+  }
+  .map-img{
+    width:100%;
+    border-radius:12px;
+    margin-top:10px;
+    display:block;
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:none;
+    border-radius:999px;
+    padding:12px 22px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    background:var(--yellow);
+    color:var(--ink);
+    box-shadow:0 3px 0 #e0af1f;
+    transition:transform .1s ease;
+  }
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #e0af1f;}
+  .btn.secondary{
+    background:var(--white);
+    color:var(--blue-deep);
+    box-shadow:0 3px 0 var(--blue-mid);
+  }
+  .btn.block{width:100%;margin-top:10px;}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+  .link-btn{
+    text-decoration:none;
+  }
+  .map-btn{
+    width:100%;
+    margin-top:10px;
+    font-size:16px;
+    padding:14px 22px;
+    background:var(--yellow);
+    box-shadow:0 4px 0 #d19e00;
+  }
+  .map-btn:active{box-shadow:0 1px 0 #d19e00;}
+
+  /* ---------- form elements ---------- */
+  .q-block{margin-bottom:20px;}
+  .q-block:last-child{margin-bottom:4px;}
+  .q-title{
+    font-weight:700;
+    font-size:15px;
+    margin-bottom:8px;
+    line-height:1.6;
+    white-space:pre-line;
+  }
+  .q-title .req{
+    color:var(--danger);
+    margin-left:4px;
+    font-size:13px;
+    font-weight:700;
+  }
+  .options{display:flex;flex-wrap:wrap;gap:8px;}
+  .opt-label{
+    display:flex;align-items:center;gap:6px;
+    border:2px solid var(--blue-mid);
+    border-radius:12px;
+    padding:9px 12px;
+    font-size:14px;
+    cursor:pointer;
+    background:#fff;
+    flex:1 1 auto;
+    min-width:120px;
+    transition:.15s;
+    position:relative;
+  }
+  .opt-label input{
+    position:absolute;
+    width:1px;height:1px;
+    opacity:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .opt-label.checked{
+    background:var(--yellow);
+    border-color:var(--yellow);
+    font-weight:700;
+  }
+  input[type=text], textarea{
+    width:100%;
+    border:2px solid var(--blue-mid);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:14.5px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink);
+    resize:vertical;
+  }
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--yellow);
+  }
+  .sub-input{margin-top:8px;}
+  .field-error{
+    color:var(--danger);
+    font-size:12.5px;
+    margin-top:6px;
+    display:none;
+  }
+  .q-block.invalid .field-error{display:block;}
+  .q-block.invalid .opt-label, .q-block.invalid input[type=text], .q-block.invalid textarea{
+    border-color:var(--danger);
+  }
+  .q-block.shake{animation:shake .4s;}
+  @keyframes shake{
+    10%,90%{transform:translateX(-2px);}
+    20%,80%{transform:translateX(4px);}
+    30%,50%,70%{transform:translateX(-6px);}
+    40%,60%{transform:translateX(6px);}
+  }
+
+  /* rules page */
+  .rules-box{
+    font-size:13.5px;
+    line-height:1.8;
+    white-space:pre-line;
+    background:#fbfbf5;
+    border-radius:12px;
+    padding:14px;
+    border:1px dashed var(--blue-mid);
+  }
+  .agree-row{
+    display:flex;align-items:flex-start;gap:10px;
+    margin-top:16px;
+    font-size:14px;
+    font-weight:600;
+  }
+  .agree-row input{width:20px;height:20px;flex:0 0 auto;margin-top:2px;accent-color:var(--blue-deep);}
+
+  /* payment */
+  .pay-row{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--yellow-light);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-top:10px;
+    gap:10px;
+  }
+  .pay-row .acc{
+    font-size:16px;font-weight:700;letter-spacing:.5px;
+  }
+  .copy-btn{
+    border:none;border-radius:999px;background:var(--blue-deep);color:#fff;
+    padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;flex:0 0 auto;
+  }
+  .qr-img{
+    width:150px;height:150px;object-fit:cover;
+    border-radius:12px;display:block;margin:12px auto 0;
+    border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+
+  #toast{
+    position:fixed;
+    left:50%;bottom:calc(80px + var(--safe-bottom));
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13.5px;
+    z-index:60;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* thank you page */
+  .thanks-page{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:100%;text-align:center;padding:24px;
+    background-image:url('images/background.png');
+    background-size:cover;background-position:center;
+  }
+  .thanks-page h1{font-size:30px;color:var(--blue-deep);margin-bottom:10px;}
+  .thanks-page p{font-size:15px;line-height:1.8;max-width:320px;}
+  .thanks-emoji{font-size:52px;margin-bottom:14px;}
+  .spinner{
+    width:18px;height:18px;border:3px solid rgba(43,58,74,.25);
+    border-top-color:var(--ink);border-radius:50%;
+    animation:spin .7s linear infinite;display:none;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .submit-err{
+    color:var(--danger);font-size:13px;text-align:center;margin-top:10px;display:none;
+  }
+
+  /* honeypot hidden field */
+  .hp-field{position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;width:0;overflow:hidden;}
+</style>
+</head>
+<body>
+
+<div id="progress"><div id="progress-fill"></div></div>
+<div id="toast"></div>
+
+<div id="app">
+  <div id="pages-wrapper">
+
+    <!-- PAGE 1 : 海報滿版 -->
+    <section class="page poster-page active" data-page="1">
+      <img class="poster-img" src="images/poster.png" alt="Aria's Birthday Party 邀請函海報">
+      <button class="btn poster-next" data-next>&gt;</button>
+    </section>
+
+    <!-- PAGE 2 : 前言 + 派對資訊 + 地圖 -->
+    <section class="page content-page" data-page="2">
+      <div class="card-wrap">
+        <div class="paper-card">
+          <p>真的是怎麼突然就27歲了😈邀請你來小小的生日派對~
+大家一起吃吃喝喝玩樂，有個輕鬆的夜晚💓帶著美好的回憶回家</p>
+        </div>
+
+        <div class="paper-card">
+          <h3>派對資訊</h3>
+          <div class="info-row"><span class="label">📅 日期</span><span>10/31（六）18:00 ~ 21:30</span></div>
+          <div class="info-row"><span class="label">💰 費用</span><span>NT$1,000</span></div>
+          <div class="info-row"><span class="label">📍 地點</span><span>台北市大同區重慶北路一段26巷28號1樓<br>北門捷運站 Y19 出口走5分鐘</span></div>
+          <a class="btn map-btn link-btn" href="https://maps.app.goo.gl/NMrLSNxPdTXDvhNJ9" target="_blank" rel="noopener">🗺️ 打開地圖</a>
+          <img class="map-img" src="images/map.jpg" alt="路線地圖">
+        </div>
+
+        <div class="paper-card">
+          <h3>活動時程</h3>
+          <p style="font-size:13px;opacity:.7;margin-bottom:6px;">（依當下狀況機動微調）</p>
+          <p>18:00–19:00　享用餐點
+19:00–19:40　派對活動
+19:45–20:00　拍立得紀念、大合照
+20:00–21:20　自由遊玩設備
+21:20–21:30　協助環境整理</p>
+        </div>
+
+        <button class="btn block" data-next>下一頁</button>
+      </div>
+    </section>
+
+    <!-- PAGE 3 : 人 + 時間 + 餐點偏好 -->
+    <section class="page content-page" data-page="3">
+      <div class="card-wrap">
+        <div class="paper-card">
+          <div class="q-block" data-required="text" data-field="name">
+            <div class="q-title">希望大家怎麼稱呼你？會有專屬小名牌<span class="req">必填</span></div>
+            <input type="text" maxlength="20" placeholder="請輸入你的稱呼">
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+
+          <div class="q-block" data-required="radio" data-field="fullParty">
+            <div class="q-title">能參加整場派對嗎？<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="fullParty" value="可以!">可以!</label>
+              <label class="opt-label"><input type="radio" name="fullParty" value="需要晚到/早走">需要晚到/早走</label>
+            </div>
+            <input type="text" class="sub-input" data-sub-of="fullParty" data-sub-trigger="需要晚到/早走" maxlength="60" placeholder="請說明大概時間" style="display:none;">
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+
+          <div class="q-block" data-required="radio" data-field="afterParty">
+            <div class="q-title">在派對之後，會參加 after party 嗎？（預計圓山或信義區）<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="afterParty" value="參加!!">參加!!</label>
+              <label class="opt-label"><input type="radio" name="afterParty" value="不要，該回家睡覺覺ㄌ">不要，該回家睡覺覺ㄌ</label>
+            </div>
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+        </div>
+
+        <div class="paper-card">
+          <h3>餐點偏好</h3>
+          <p style="font-size:12.5px;opacity:.65;margin-top:-4px;">以下僅供採買參考，不保證一定出現喔～</p>
+
+          <div class="q-block" data-field="dinner">
+            <div class="q-title">晚餐時間，想吃的偏好</div>
+            <input type="text" maxlength="80" placeholder="填空">
+          </div>
+          <div class="q-block" data-field="snack">
+            <div class="q-title">希望出現的點心</div>
+            <input type="text" maxlength="80" placeholder="填空">
+          </div>
+          <div class="q-block" data-field="avoid">
+            <div class="q-title">有什麼不吃的嗎</div>
+            <input type="text" maxlength="80" placeholder="填空">
+          </div>
+          <div class="q-block" data-required="radio" data-field="drink">
+            <div class="q-title">會準備一支酒，和其他酒精小點心，你會喝酒嗎？<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="drink" value="喝酒">喝酒</label>
+              <label class="opt-label"><input type="radio" name="drink" value="不喝酒">不喝酒</label>
+            </div>
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+        </div>
+
+        <button class="btn block" data-next>下一頁</button>
+      </div>
+    </section>
+
+    <!-- PAGE 4 : 活動偏好 + 穿搭想法 -->
+    <section class="page content-page" data-page="4">
+      <div class="card-wrap">
+        <div class="paper-card">
+          <div class="q-block" data-required="checkbox" data-field="activities">
+            <div class="q-title">會想參與的活動，了解偏好而已，現場自由遊玩（可複選）<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="checkbox" name="activities" value="電動麻將桌">電動麻將桌</label>
+              <label class="opt-label"><input type="checkbox" name="activities" value="Switch">Switch（Mario kart、Overcook、炸彈人、Just Dance…）</label>
+              <label class="opt-label"><input type="checkbox" name="activities" value="桌遊">桌遊（狼人殺、破冰企鵝、三國殺、UNO…）</label>
+              <label class="opt-label"><input type="checkbox" name="activities" value="唱歌">唱歌（雲端更新，中英日韓都有）</label>
+              <label class="opt-label"><input type="checkbox" name="activities" value="街機遊戲">街機遊戲</label>
+              <label class="opt-label"><input type="checkbox" name="activities" value="變色球池">變色球池</label>
+            </div>
+            <div class="field-error">至少要選一項喔！</div>
+          </div>
+
+          <div class="q-block" data-required="radio" data-field="introvert">
+            <div class="q-title">會很怕新朋友嗎<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="introvert" value="會，我超I，請多關心我">會，我超I，請多關心我</label>
+              <label class="opt-label"><input type="radio" name="introvert" value="不會，我E人，我會到處打開I人">不會，我E人，我會到處打開I人</label>
+              <label class="opt-label"><input type="radio" name="introvert" value="半I半E，我都可以">半I半E，我都可以</label>
+            </div>
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+
+          <div class="q-block" data-required="radio" data-field="quiz">
+            <div class="q-title">大E人本人，會有個活動環節，會想參加嗎？有點像搶答之類的，不會嚇死I人<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="quiz" value="一定要!!">一定要!!</label>
+              <label class="opt-label"><input type="radio" name="quiz" value="不要">不要</label>
+            </div>
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+
+          <div class="q-block" data-field="tv">
+            <div class="q-title">你有看過的電視劇（可複選）</div>
+            <div class="options">
+              <label class="opt-label"><input type="checkbox" name="tv" value="甄嬛傳">甄嬛傳（身為甄學家，這題必考）</label>
+              <label class="opt-label"><input type="checkbox" name="tv" value="珍珠美人魚">珍珠美人魚</label>
+              <label class="opt-label"><input type="checkbox" name="tv" value="進擊的巨人">進擊的巨人</label>
+              <label class="opt-label"><input type="checkbox" name="tv" value="哈利波特">哈利波特</label>
+              <label class="opt-label"><input type="checkbox" name="tv" value="其他">其他</label>
+            </div>
+            <input type="text" class="sub-input" data-sub-of="tv" data-sub-trigger="其他" maxlength="60" placeholder="請填寫其他劇名" style="display:none;">
+          </div>
+
+          <div class="q-block" data-field="music">
+            <div class="q-title">你平常聽的歌（可複選）</div>
+            <div class="options">
+              <label class="opt-label"><input type="checkbox" name="music" value="中文老歌">中文老歌</label>
+              <label class="opt-label"><input type="checkbox" name="music" value="中文樂團">中文樂團</label>
+              <label class="opt-label"><input type="checkbox" name="music" value="日文">日文</label>
+              <label class="opt-label"><input type="checkbox" name="music" value="韓文">韓文</label>
+              <label class="opt-label"><input type="checkbox" name="music" value="英文">英文</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="paper-card">
+          <div class="q-block" data-required="radio" data-field="costume">
+            <div class="q-title">剛好是萬聖節🎃歡迎大家裝扮前來！大大小小都可以!<span class="req">必填</span></div>
+            <div class="options">
+              <label class="opt-label"><input type="radio" name="costume" value="我要參加!!">我要參加!!</label>
+              <label class="opt-label"><input type="radio" name="costume" value="不參加，穿著舒服前來即可">不參加，穿著舒服前來即可</label>
+            </div>
+            <div class="field-error">這題要填寫喔！</div>
+          </div>
+        </div>
+
+        <button class="btn block" data-next>下一頁</button>
+      </div>
+    </section>
+
+    <!-- PAGE 5 : 場地守則 -->
+    <section class="page content-page" data-page="5">
+      <div class="card-wrap">
+        <div class="paper-card">
+          <div class="rules-box">清潔與垃圾
+請保持場地整潔，如交還時發現嚴重清潔問題（如亂丟垃圾／使織物髒污）將酌收清潔費 $4000 起。離開前請將垃圾置於提供的垃圾袋內。
+
+飲酒與嘔吐
+如喝酒後在場內嘔吐（包括廁所），酌收清潔費 $4000 起／每次（視乎嘔吐位置）。
+如嘔吐物噴濺在電器、織物、球池等物品導致無法清潔，將視為損壞場地物品而需照價賠償。
+
+攜帶酒水／球池
+攜帶酒精類飲品進場將收取開瓶費 $500／瓶。嚴禁在球池內飲食，一經發現罰款 $4000。
+
+個人財物
+請小心妥善保管個人財物，本店將不負責與賠償任何損失，如有遺失物需要尋回請告知服務人員協尋。
+
+設備使用
+場地設備如因人為操縱不當而引致損毀，客人需按設施原價賠償。請勿直接調較音響設備及遊樂設備（switch），如有需要請向場地服務員詢問。只能使用藍丁膠或紙膠帶貼牆壁，如造成牆壁損壞亦須賠償。
+
+人數與法律責任
+所有出席人數皆計算在內，亦不設中途換人，如欲臨時增加人數也請告知服務人員。客人在本店內構成任何法律責任，一切由客人自行負責。
+
+行為規範
+嚴禁在場地內抽菸、吸毒、放煙火、打架，以及一切違法不文明之行為者將直接報警處理。如有違反本場地守則，場地職員有權邀請客人離開場地，費用將不會退還。
+
+時間規定
+預約時間確認後不設提早或遲到補時，煩請準時到達。如超時離場多餘 15 分鐘將直接按續鐘 1 小時價格計算。因故提早離場，收費仍會按照原先租場時間計算。
+
+如有任何爭議，獨角獸派對將保留最終決定權。</div>
+
+          <div class="q-block" data-required="checkbox-single" data-field="agree">
+            <label class="agree-row">
+              <input type="checkbox" name="agree" value="同意">
+              我已詳閱並同意以上場地守則
+            </label>
+            <div class="field-error">要先勾選同意才能繼續喔！</div>
+          </div>
+        </div>
+
+        <button class="btn block" data-next>下一頁</button>
+      </div>
+    </section>
+
+    <!-- PAGE 6 : 其他 + 轉帳資訊 + 送出 -->
+    <section class="page content-page" data-page="6">
+      <div class="card-wrap">
+        <div class="paper-card">
+          <div class="q-block" data-field="other">
+            <div class="q-title">偷偷跟我說，或是希望我默默注意的事情</div>
+            <textarea maxlength="300" rows="4" placeholder="自由填寫"></textarea>
+          </div>
+        </div>
+
+        <div class="paper-card">
+          <h3>轉帳資訊</h3>
+          <p>費用：NT$1,000
+請於 9/30 前完成轉帳，若有學生證或10月生日可帶著證件，當天小折扣！</p>
+          <div class="pay-row">
+            <span class="acc">808 玉山銀行　0521979167650</span>
+            <button type="button" class="copy-btn" id="copyBtn">複製帳號</button>
+          </div>
+          <img class="qr-img" src="images/qrcode-placeholder.png" alt="收款 QR code">
+        </div>
+
+        <button class="btn block" id="submitBtn">
+          <span id="submitLabel">送出</span>
+          <span class="spinner" id="submitSpinner"></span>
+        </button>
+        <div class="submit-err" id="submitErr">送出時發生問題，請檢查網路連線後再試一次！</div>
+      </div>
+
+      <!-- honeypot -->
+      <div class="hp-field"><input type="text" id="hp" name="website" tabindex="-1" autocomplete="off"></div>
+    </section>
+
+    <!-- PAGE 7 : 完成頁 -->
+    <section class="page thanks-page" data-page="7">
+      <div class="thanks-emoji">🎉</div>
+      <h1>謝謝妳!!</h1>
+      <p>派對見!! 💓<br>10/31（六）18:00，記得帶著好心情過來～</p>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ===== 設定：把下面這行換成你自己的 Google Apps Script Web App 網址 =====
+  var ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbybHyexACRb73zM-5lEFPnOFetTOhtdyFq-fqtnJ_i8o_fLRcApbI5OMR0PoSTBitlR/exec";
+  var SECRET_TOKEN = "aria27party"; // 記得跟 Apps Script 裡的 SECRET 設一樣的值
+
+  var TOTAL = 7;
+  var current = 1;
+  var wrapper = document.getElementById("pages-wrapper");
+  var pages = Array.prototype.slice.call(document.querySelectorAll(".page"));
+  var progressFill = document.getElementById("progress-fill");
+  var toastEl = document.getElementById("toast");
+  var STORAGE_KEY = "ariaParty_rsvp_v1";
+
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function(){ toastEl.classList.remove("show"); }, 1800);
+  }
+
+  function goTo(n){
+    if(n < 1) n = 1;
+    if(n > TOTAL) n = TOTAL;
+    current = n;
+    wrapper.style.transform = "translateX(-" + ((n-1) * (100/TOTAL)) + "%)";
+    pages.forEach(function(p){ p.classList.toggle("active", parseInt(p.dataset.page,10) === n); });
+    document.body.classList.toggle("show-progress", n > 1 && n < TOTAL);
+    progressFill.style.width = ((n-1)/(TOTAL-1) * 100) + "%";
+    pages[n-1].scrollTop = 0;
+    window.scrollTo(0,0);
+  }
+
+  // ---- conditional sub-inputs (顯示/隱藏 附加填寫框) ----
+  document.querySelectorAll("[data-sub-of]").forEach(function(sub){
+    var group = sub.dataset.subOf;
+    var trigger = sub.dataset.subTrigger;
+    document.querySelectorAll('input[name="'+group+'"]').forEach(function(input){
+      input.addEventListener("change", function(){
+        var show = false;
+        document.querySelectorAll('input[name="'+group+'"]:checked').forEach(function(c){
+          if(c.value === trigger) show = true;
+        });
+        sub.style.display = show ? "block" : "none";
+        if(!show) sub.value = "";
+      });
+    });
+  });
+
+  // ---- opt-label 高亮 ----
+  document.querySelectorAll(".opt-label input").forEach(function(input){
+    input.addEventListener("change", function(){
+      var name = input.name;
+      document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){
+        i.closest(".opt-label").classList.toggle("checked", i.checked);
+      });
+      autosave();
+    });
+  });
+  document.querySelectorAll('input[type=text], textarea').forEach(function(el){
+    el.addEventListener("input", autosave);
+  });
+
+  // ---- validation ----
+  function clearInvalid(block){ block.classList.remove("invalid"); }
+
+  function validateBlock(block){
+    var type = block.dataset.required;
+    if(!type) return true;
+    var ok = true;
+    if(type === "text"){
+      var input = block.querySelector("input[type=text]");
+      ok = input && input.value.trim().length > 0;
+    } else if(type === "radio"){
+      var name = block.querySelector("input[type=radio]").name;
+      ok = !!block.querySelector('input[name="'+name+'"]:checked');
+      if(ok){
+        var checkedInput = block.querySelector('input[name="'+name+'"]:checked');
+        var sub = block.querySelector('[data-sub-of="'+name+'"]');
+        if(sub && sub.style.display !== "none"){
+          ok = sub.value.trim().length > 0;
+        }
+      }
+    } else if(type === "checkbox"){
+      var name2 = block.querySelector("input[type=checkbox]").name;
+      ok = block.querySelectorAll('input[name="'+name2+'"]:checked').length > 0;
+    } else if(type === "checkbox-single"){
+      ok = block.querySelector("input[type=checkbox]").checked;
+    }
+    block.classList.toggle("invalid", !ok);
+    return ok;
+  }
+
+  function validatePage(n){
+    var page = pages[n-1];
+    var blocks = page.querySelectorAll(".q-block[data-required]");
+    var firstInvalid = null;
+    var allOk = true;
+    blocks.forEach(function(b){
+      var ok = validateBlock(b);
+      if(!ok){
+        allOk = false;
+        if(!firstInvalid) firstInvalid = b;
+        b.classList.add("shake");
+        setTimeout(function(){ b.classList.remove("shake"); }, 400);
+      }
+    });
+    if(!allOk && firstInvalid){
+      firstInvalid.scrollIntoView({behavior:"smooth", block:"center"});
+      toast("還有必填問題沒填寫喔！");
+    }
+    return allOk;
+  }
+
+  document.querySelectorAll("[data-next]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if(!validatePage(current)) return;
+      goTo(current + 1);
+    });
+  });
+
+  // ---- copy account button ----
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var text = "0521979167650";
+    var done = function(){ toast("帳號已複製 📋"); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  });
+  function fallbackCopy(text, cb){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.left = "-9999px";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand("copy"); cb(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  // ---- collect answers ----
+  function textOf(field){
+    var block = document.querySelector('.q-block[data-field="'+field+'"]');
+    if(!block) return "";
+    var input = block.querySelector("input[type=text]:not([data-sub-of]), textarea");
+    return input ? input.value.trim() : "";
+  }
+  function radioOf(field){
+    var checked = document.querySelector('input[name="'+field+'"]:checked');
+    return checked ? checked.value : "";
+  }
+  function subOf(field){
+    var sub = document.querySelector('[data-sub-of="'+field+'"]');
+    if(sub && sub.style.display !== "none") return sub.value.trim();
+    return "";
+  }
+  function checkboxOf(field){
+    var arr = [];
+    document.querySelectorAll('input[name="'+field+'"]:checked').forEach(function(c){ arr.push(c.value); });
+    return arr.join("、");
+  }
+
+  function collect(){
+    return {
+      secret: SECRET_TOKEN,
+      honeypot: document.getElementById("hp").value,
+      answers: [
+        textOf("name"),
+        radioOf("fullParty"),
+        subOf("fullParty"),
+        radioOf("afterParty"),
+        textOf("dinner"),
+        textOf("snack"),
+        textOf("avoid"),
+        radioOf("drink"),
+        checkboxOf("activities"),
+        radioOf("introvert"),
+        radioOf("quiz"),
+        checkboxOf("tv"),
+        subOf("tv"),
+        checkboxOf("music"),
+        radioOf("costume"),
+        textOf("other")
+      ]
+    };
+  }
+
+  // ---- autosave to localStorage (方便誤觸重整不用重填) ----
+  function autosave(){
+    try{
+      var data = collect();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(e){}
+  }
+  function restore(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      // 簡易還原：稱呼 / 偏好文字欄位（選項類題目重新整理時不強制還原，避免邏輯過於複雜）
+      var textFields = {name:0, dinner:4, snack:5, avoid:6, other:15};
+      Object.keys(textFields).forEach(function(f){
+        var block = document.querySelector('.q-block[data-field="'+f+'"]');
+        var input = block && block.querySelector("input[type=text], textarea");
+        if(input && data.answers[textFields[f]]) input.value = data.answers[textFields[f]];
+      });
+    }catch(e){}
+  }
+  restore();
+
+  // ---- submit ----
+  var submitBtn = document.getElementById("submitBtn");
+  var submitLabel = document.getElementById("submitLabel");
+  var submitSpinner = document.getElementById("submitSpinner");
+  var submitErr = document.getElementById("submitErr");
+
+  submitBtn.addEventListener("click", function(){
+    var page6 = pages[5];
+    // 這頁沒有 data-required 的 q-block（除了送出前不擋任何必填，因為此頁全為選填），但仍檢查前面頁面是否漏填
+    for(var i=2;i<=5;i++){
+      var p = pages[i-1];
+      var blocks = p.querySelectorAll(".q-block[data-required]");
+      var ok = true;
+      blocks.forEach(function(b){ if(!validateBlock(b)) ok = false; });
+      if(!ok){
+        toast("還有頁面的必填問題沒填寫完喔！");
+        goTo(i);
+        return;
+      }
+    }
+
+    if(ENDPOINT_URL.indexOf("PASTE_YOUR") === 0){
+      alert("還沒設定 Google Apps Script 網址喔！請先照 README 完成設定，再把網址貼到 index.html 的 ENDPOINT_URL。");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = "送出中...";
+    submitSpinner.style.display = "inline-block";
+    submitErr.style.display = "none";
+
+    var payload = collect();
+
+    fetch(ENDPOINT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function(){
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      goTo(7);
+    }).catch(function(){
+      submitBtn.disabled = false;
+      submitLabel.textContent = "送出";
+      submitSpinner.style.display = "none";
+      submitErr.style.display = "block";
+    });
+  });
+
+  goTo(1);
+})();
+</script>
+</body>
+</html>
