@@ -70,11 +70,17 @@
   body.show-progress #progress{display:block;}
 
   /* ---------- page 1 : poster ---------- */
-  .poster-page{padding:0!important;height:100%;}
+  .poster-page{padding:0!important;height:100%;background:var(--blue-light);}
   .poster-img{
     width:100%;height:100%;
     object-fit:cover;object-position:center top;
     display:block;
+  }
+  @media (min-width:640px){
+    .poster-img{
+      object-fit:contain;
+      object-position:center center;
+    }
   }
   .poster-next{
     position:absolute;
@@ -85,6 +91,11 @@
     padding:0;
     border-radius:50%;
     font-size:22px;
+    animation:pulse-btn 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-btn{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.18);}
   }
 
   /* ---------- content pages ---------- */
@@ -221,7 +232,7 @@
     border:2px solid var(--blue-mid);
     border-radius:10px;
     padding:10px 12px;
-    font-size:14.5px;
+    font-size:16px;
     font-family:inherit;
     background:#fff;
     color:var(--ink);
@@ -284,11 +295,6 @@
     border:none;border-radius:999px;background:var(--blue-deep);color:#fff;
     padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;flex:0 0 auto;
   }
-  .qr-img{
-    width:150px;height:150px;object-fit:cover;
-    border-radius:12px;display:block;margin:12px auto 0;
-    border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);
-  }
 
   #toast{
     position:fixed;
@@ -313,9 +319,26 @@
     background-image:url('images/background.png');
     background-size:cover;background-position:center;
   }
-  .thanks-page h1{font-size:30px;color:var(--blue-deep);margin-bottom:10px;}
-  .thanks-page p{font-size:15px;line-height:1.8;max-width:320px;}
-  .thanks-emoji{font-size:52px;margin-bottom:14px;}
+  .thanks-page h1{font-size:26px;color:var(--blue-deep);margin:4px 0 16px;}
+  .thanks-flower{
+    width:180px;max-width:55%;
+    display:block;
+    margin-bottom:6px;
+    animation:sway-flower 3.5s ease-in-out infinite;
+    transform-origin:bottom center;
+  }
+  @keyframes sway-flower{
+    0%,100%{transform:rotate(-3deg);}
+    50%{transform:rotate(3deg);}
+  }
+  .thanks-info{
+    font-size:14.5px;
+    line-height:2;
+    color:var(--ink);
+    background:rgba(255,255,255,.7);
+    border-radius:14px;
+    padding:14px 20px;
+  }
   .spinner{
     width:18px;height:18px;border:3px solid rgba(43,58,74,.25);
     border-top-color:var(--ink);border-radius:50%;
@@ -348,8 +371,9 @@
     <section class="page content-page" data-page="2">
       <div class="card-wrap">
         <div class="paper-card">
-          <p>真的是怎麼突然就27歲了😈邀請你來小小的生日派對~
-大家一起吃吃喝喝玩樂，有個輕鬆的夜晚💓帶著美好的回憶回家</p>
+          <p>時間過太快，突然就迎來27歲啦😈
+辦了場小小的生日派對，想找你們一起來吃喝玩樂！
+希望能一起度過個輕鬆歡樂的夜晚💓 等你來玩！</p>
         </div>
 
         <div class="paper-card">
@@ -572,7 +596,6 @@
             <span class="acc">808 玉山銀行　0521979167650</span>
             <button type="button" class="copy-btn" id="copyBtn">複製帳號</button>
           </div>
-          <img class="qr-img" src="images/qrcode-placeholder.png" alt="收款 QR code">
         </div>
 
         <button class="btn block" id="submitBtn">
@@ -588,9 +611,12 @@
 
     <!-- PAGE 7 : 完成頁 -->
     <section class="page thanks-page" data-page="7">
-      <div class="thanks-emoji">🎉</div>
-      <h1>謝謝妳!!</h1>
-      <p>派對見!! 💓<br>10/31（六）18:00，記得帶著好心情過來～</p>
+      <img class="thanks-flower" src="images/flower.png" alt="花束">
+      <h1>謝謝你!! 派對見!!</h1>
+      <div class="thanks-info">
+        <div>📅 10/31（六）18:00 ~ 21:30</div>
+        <div>📍 台北市大同區重慶北路一段26巷28號1樓</div>
+      </div>
     </section>
 
   </div>
