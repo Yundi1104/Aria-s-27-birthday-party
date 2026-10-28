@@ -1,0 +1,156 @@
+/* 入口頁、時程表、場地・轉帳資訊（pg-）。配色用 game.css 最上面的變數 */
+html,body{height:auto;min-height:100%;}
+/* 背景圖固定在畫面上（頁面很長時往下滑也不會露出底下的純藍色） */
+.pg-wrap{position:relative;min-height:100%;background:var(--blue-light);}
+.pg-wrap::before{content:"";position:fixed;left:0;right:0;top:0;bottom:0;z-index:0;pointer-events:none;background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}
+.pg-inner{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:14px 14px 44px;}
+
+.pg-bar{display:flex;align-items:center;gap:10px;}
+.pg-back{color:var(--blue-deep);font-weight:800;font-size:14px;text-decoration:none;background:rgba(255,255,255,.9);border-radius:99px;padding:5px 14px;border:2px solid var(--blue-mid);}
+.pg-bar-t{flex:1;text-align:right;font-size:13px;opacity:.6;}
+.pg-head{text-align:center;margin:14px 0 12px;}
+.pg-head h1{font-size:25px;margin:0 0 4px;color:var(--blue-deep);text-shadow:1px 1px 0 #fff;line-height:1.3;}
+.pg-head p{margin:0;font-size:14px;opacity:.8;}
+.pg-now{background:var(--yellow);border-radius:14px;padding:10px 14px;font-weight:800;font-size:15px;text-align:center;margin-bottom:10px;box-shadow:0 3px 0 var(--yellow-shadow);line-height:1.5;}
+.pg-scorebox{background:rgba(255,255,255,.95);border:2px solid var(--yellow);border-radius:16px;padding:12px 14px;margin-bottom:10px;text-align:center;box-shadow:0 3px 0 var(--yellow-border);}
+.pg-scorebox .t{font-weight:800;font-size:15px;}
+.pg-scorebox .n{font-size:20px;font-weight:800;margin:4px 0;}
+.pg-scorebox .r{font-size:13px;opacity:.7;}
+
+.pg-sec{font-size:14px;margin:18px 4px 8px;opacity:.7;font-weight:800;}
+.pg-list{display:flex;flex-direction:column;gap:9px;}
+.pg-tile{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.95);border:2px solid var(--blue-mid);border-radius:16px;padding:12px 14px;
+  text-decoration:none;color:var(--ink);box-shadow:0 3px 0 var(--blue-mid);}
+.pg-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--blue-mid);}
+.pg-tile .ic{font-size:30px;flex:0 0 auto;}
+.pg-tile .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.pg-tile .tx b{font-size:17px;}
+.pg-tile .tx small{font-size:12.5px;opacity:.7;line-height:1.4;}
+.pg-tile.off{opacity:.55;box-shadow:none;}
+.pg-chip{flex:0 0 auto;font-size:12px;font-weight:800;border-radius:99px;padding:3px 10px;background:var(--blue-pale);color:var(--blue-deep);white-space:nowrap;}
+.pg-chip.live{background:var(--ok);color:#fff;}
+.pg-chip.end{background:var(--ink);color:#fff;}
+.pg-tip{font-size:12.5px;opacity:.65;text-align:center;margin:8px 4px;line-height:1.6;}
+
+/* 時程表 */
+.pg-sched{background:rgba(255,255,255,.55);border-radius:16px;padding:4px 8px;}
+.pg-srow{display:flex;gap:12px;padding:12px 8px;border-bottom:1.5px dashed var(--blue-mid);border-radius:12px;}
+.pg-srow:last-child{border-bottom:none;}
+.pg-srow .tm{flex:0 0 108px;font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;color:var(--sched-time,#25557a);padding-top:2px;}
+.pg-srow .wh{flex:1;min-width:0;}
+.pg-srow .ti{font-size:17px;font-weight:700;line-height:1.4;}
+.pg-srow.now{background:var(--yellow-pale);border-bottom-color:transparent;box-shadow:inset 0 0 0 2px var(--yellow);}
+.pg-srow.past{opacity:.5;}
+.pg-badge{display:inline-block;margin-left:8px;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:800;border-radius:99px;padding:1px 9px;vertical-align:middle;}
+.pg-go{display:inline-block;margin-top:6px;font-size:13px;font-weight:800;color:var(--blue-deep);text-decoration:none;background:#fff;border:2px solid var(--blue-mid);border-radius:99px;padding:3px 12px;}
+
+/* 場地・轉帳資訊（沒有框，用虛線分段，跟邀請函一致） */
+.pg-info{background:rgba(255,255,255,.74);border-radius:16px;padding:14px 16px 10px;margin:0 0 10px;box-shadow:0 2px 10px rgba(43,58,74,.08);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}   /* 文字下面墊一層半透明白色底板，字比較清楚 */
+.pg-info h3{margin:0 0 8px;font-size:16px;color:var(--blue-deep);}
+.pg-info p{margin:0 0 7px;font-size:15px;line-height:1.7;white-space:pre-line;}
+.pg-info p.big{font-size:19px;font-weight:800;}
+.pg-btns{display:flex;gap:8px;margin:10px 0;}
+.pg-btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:99px;padding:10px 18px;font-size:15px;font-weight:800;cursor:pointer;
+  background:var(--yellow);color:var(--ink);text-decoration:none;box-shadow:0 3px 0 var(--yellow-shadow);font-family:inherit;}
+.pg-btn.ghost{background:#fff;color:var(--blue-deep);box-shadow:0 3px 0 var(--blue-mid);}
+.pg-map{width:100%;border-radius:12px;display:block;margin-top:4px;}
+.pg-pay{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--yellow-pale);border-radius:12px;padding:12px 14px;margin-top:6px;}
+.pg-pay .acc{font-size:16px;font-weight:800;letter-spacing:.3px;}
+.pg-copy{border:none;border-radius:99px;background:var(--blue-deep);color:#fff;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;flex:0 0 auto;font-family:inherit;}
+.pg-rules details{border-bottom:1px dashed var(--blue-mid);padding:8px 2px;}
+.pg-rules summary{cursor:pointer;font-weight:800;font-size:15px;}
+.pg-rules details p{margin:8px 0 4px;font-size:14px;line-height:1.75;}
+.pg-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;
+  font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap;}
+.pg-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 主持人入口 */
+.hi-wrap{max-width:560px;margin:0 auto;padding:24px 16px 50px;}
+.hi-wrap h1{font-size:24px;margin:0 0 4px;color:var(--blue-deep);}
+.hi-wrap p.s{margin:0 0 16px;font-size:14px;opacity:.7;line-height:1.6;}
+.hi-sec{font-size:14px;font-weight:800;opacity:.7;margin:18px 2px 8px;}
+.hi-link{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--blue-mid);border-radius:14px;padding:12px 14px;margin-bottom:8px;text-decoration:none;color:var(--ink);box-shadow:0 3px 0 var(--blue-mid);}
+.hi-link .t{flex:1;font-size:17px;font-weight:800;}
+.hi-link .tm{font-size:13px;opacity:.6;font-variant-numeric:tabular-nums;}
+.hi-link small{display:block;font-size:12.5px;font-weight:400;opacity:.65;}
+
+/* 菜單：像咖啡廳的紙本菜單（參考圖）——奶油色的一張紙，藍色字，大大的 MENU，分類標題，每道菜左邊小圖示。
+   紙放在和其他頁一樣的背景上；顏色在 .mn-sheet 最上面的變數，想換色改那幾個。 */
+.mn-sheet{--mn-paper:#f4f0e3; --mn-blue:#2a67b5; --mn-soft:#5f86b8; --mn-line:#2a67b5; --mn-bad:#c0453d; --mn-warn:#a8791c;
+  position:relative;background:var(--mn-paper);color:var(--mn-blue);border-radius:22px;padding:22px 20px 20px;margin-top:6px;overflow:hidden;
+  box-shadow:0 6px 22px rgba(43,58,74,.16);font-family:"Arial Rounded MT Bold","Hiragino Maru Gothic ProN","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;}
+.mn-head{position:relative;text-align:center;padding:14px 0 2px;}
+.mn-squig{position:absolute;left:-8px;top:-10px;width:56px;height:42px;fill:none;stroke:var(--mn-blue);stroke-width:8;stroke-linecap:round;stroke-linejoin:round;}
+.mn-kicker{font-size:11px;font-weight:800;letter-spacing:3px;margin:0 0 0 30px;opacity:.9;}
+.mn-title{margin:6px 0 0;font-size:78px;line-height:.95;font-weight:900;letter-spacing:2px;color:var(--mn-blue);}
+.mn-dot{position:absolute;border-radius:50%;border:3px solid var(--mn-blue);}
+.mn-dot.o{right:2px;top:-2px;width:18px;height:18px;}
+.mn-dot.f{right:24px;top:20px;width:13px;height:13px;background:var(--mn-blue);}
+.mn-rule{height:4px;border-radius:4px;background:var(--mn-line);margin:8px 0 14px;}
+.mn-note{margin:0 0 12px;font-size:13px;line-height:1.6;text-align:center;}
+.mn-filter{border:2px solid var(--mn-blue);border-radius:14px;padding:9px 11px;margin-bottom:12px;}
+.mn-filter .t{font-size:13px;font-weight:800;margin-bottom:7px;}
+.mn-filter .chips{display:flex;flex-wrap:wrap;gap:6px;}
+.mn-chip{border:2px solid var(--mn-blue);background:transparent;border-radius:99px;padding:3px 11px;font-size:13px;font-weight:800;color:var(--mn-blue);cursor:pointer;font-family:inherit;}
+.mn-chip.on{background:var(--mn-bad);border-color:var(--mn-bad);color:#fff;}
+.mn-sec{margin:0 0 18px;}
+.mn-sh{margin:0 0 10px;font-size:30px;line-height:1.15;font-weight:900;color:var(--mn-blue);display:flex;align-items:baseline;gap:10px;}
+.mn-sh small{font-size:11px;font-weight:800;letter-spacing:2.5px;opacity:.65;}
+.mn-list{display:flex;flex-direction:column;gap:12px;}
+.mn-item{display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s cubic-bezier(.2,.8,.2,1);}
+.mn-item.in{opacity:1;transform:none;}
+.mn-ic{flex:0 0 58px;width:58px;height:58px;border-radius:50%;border:2.5px solid var(--mn-blue);display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(42,103,181,.06);}
+.mn-ic .em{font-size:30px;line-height:1;}
+.mn-ic.has-img{border:none;background:transparent;overflow:visible;}                    /* 有去背圖：不要圓框，圖直接放大一點 */
+.mn-ic.has-img img{width:66px;height:66px;max-width:none;object-fit:contain;filter:drop-shadow(0 3px 0 rgba(42,103,181,.18));}
+.mn-bd{flex:1;min-width:0;}
+.mn-nm{font-size:18px;line-height:1.3;font-weight:900;color:var(--mn-blue);overflow-wrap:anywhere;}
+.mn-ct{font-size:13.5px;line-height:1.55;font-weight:600;color:var(--mn-soft);margin-top:1px;}
+.mn-flag{font-size:12.5px;font-weight:800;margin-top:2px;}
+.mn-flag:empty{display:none;}
+.mn-item.bad .mn-ic,.mn-item.bad .mn-nm,.mn-item.bad .mn-ct{opacity:.35;filter:grayscale(1);}
+.mn-item.bad .mn-flag{color:var(--mn-bad);}
+.mn-item.unknown .mn-flag{color:var(--mn-warn);}
+.mn-foot{text-align:center;margin-top:8px;}
+.mn-foot .t{font-size:16px;font-weight:900;color:var(--mn-blue);}
+
+/* 入口頁：標題圖、按鈕格子、貼紙圖片按鈕 */
+.pg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.pg-logo{display:block;width:82%;max-width:380px;margin:2px auto 6px;}
+.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;}
+.pg-grid .pg-tile{grid-column:1 / -1;}
+.pg-imgbtn{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--ink);-webkit-tap-highlight-color:transparent;}
+.pg-imgbtn img{display:block;width:80%;max-width:184px;height:auto;filter:drop-shadow(0 4px 0 rgba(43,58,74,.16));transition:transform .15s ease;}
+.pg-imgbtn:active img{transform:scale(.95) rotate(-1.5deg);}
+
+.pg-chip:empty{display:none;}
+
+/* 頁面標題圖（貼紙）與統一的返回鈕 */
+.pg-titleimg{display:block;width:40%;max-width:150px;margin:0 auto 4px;filter:drop-shadow(0 4px 0 rgba(43,58,74,.14));}
+.pg-back{display:inline-block;color:var(--blue-deep);font-weight:800;font-size:14px;text-decoration:none;background:rgba(255,255,255,.92);border-radius:99px;padding:6px 16px;border:2px solid var(--blue-mid);}
+.bp-returnrow{padding:0 2px 6px;}
+.bp-return{display:inline-block;color:var(--blue-deep);font-weight:800;font-size:13px;line-height:1.2;text-decoration:none;background:rgba(255,255,255,.92);border-radius:99px;padding:4px 12px;border:2px solid var(--blue-mid);cursor:pointer;}
+.bp-return.mini{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;padding:0 0 3px;font-size:22px;line-height:1;border-radius:50%;}
+
+/* 活動資訊：自動複製不了時的備案 */
+.pg-manualbox{margin-top:6px;}
+.pg-manual{width:100%;box-sizing:border-box;border:2px solid var(--blue-deep);border-radius:12px;padding:10px 12px;font-size:16px;font-weight:700;background:#fff;color:var(--ink);font-family:inherit;}
+
+/* 入口頁：簽到視窗 */
+.pg-dlg{position:fixed;inset:0;z-index:200;background:rgba(43,58,74,.72);display:flex;align-items:center;justify-content:center;padding:20px;animation:pgDlgIn .3s ease-out;}
+.pg-dlg-card{width:100%;max-width:340px;background:#fff;border-radius:24px;padding:26px 22px 22px;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:pgDlgPop .45s cubic-bezier(.2,1.5,.4,1);}
+.pg-dlg-card .em{font-size:54px;line-height:1.1;}
+.pg-dlg-card h2{margin:6px 0 2px;font-size:25px;font-weight:800;color:var(--ink);}
+.pg-dlg-card p{margin:0 0 14px;font-size:17px;font-weight:700;color:var(--blue-deep);}
+.pg-dlg-card label{display:block;text-align:left;font-size:14px;font-weight:700;margin:0 0 4px;opacity:.75;}
+.pg-dlg-card .bp-select{width:100%;margin-bottom:6px;}
+.pg-dlg-card .hint{min-height:20px;font-size:14px;font-weight:700;color:var(--danger);margin-bottom:6px;}
+.pg-dlg-card .bp-btn{width:100%;}
+@keyframes pgDlgIn{from{opacity:0;}to{opacity:1;}}
+@keyframes pgDlgPop{from{transform:scale(.6);opacity:0;}to{transform:none;opacity:1;}}
+
+/* 時程表：標題下面的小字（例如換裝時間） */
+.pg-srow .no{font-size:13px;font-weight:600;opacity:.75;margin-top:2px;}
+/* 入口頁：派對解鎖之前的「???」按鈕（不能點） */
+.pg-entry.locked{cursor:default;pointer-events:none;-webkit-tap-highlight-color:transparent;}
+.pg-locktxt{display:block;text-align:center;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--blue-deep);margin-top:-4px;}

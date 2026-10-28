@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="js/party-theme.js"></script>
+<title>問答 · 預覽 Demo</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/quiz.css">
+<link rel="stylesheet" href="css/dark.css">
+<style>
+  body{display:flex;flex-direction:column;height:100vh;}
+  .demo-bar{flex:0 0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 14px;background:var(--yellow);font-size:14px;}
+  .demo-bar b{font-size:16px;}
+  .demo-bar button,.demo-bar select{border:none;border-radius:99px;padding:7px 16px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);cursor:pointer;}
+  .demo-bar button:disabled{opacity:.45;cursor:not-allowed;}
+  .demo-bar .sp{flex:1;}
+  .demo-main{flex:1;min-height:0;display:flex;gap:16px;padding:14px;align-items:stretch;}
+  .phone{flex:0 0 392px;max-height:820px;align-self:center;height:100%;border:9px solid var(--ink);border-radius:34px;overflow:hidden;background:#fff;position:relative;}
+  .phone>div{height:100%;}
+  .hostbox{flex:1;min-width:0;border-radius:14px;overflow:hidden;border:3px solid var(--ink);}
+  .hostbox>div{height:100%;}
+  @media (max-width:980px){
+    body{height:auto;}
+    .demo-main{flex-direction:column;padding:0;gap:10px;}
+    .phone{flex:none;width:100%;max-width:480px;height:min(820px,100vh);align-self:center;border:none;border-radius:0;}
+    .hostbox{flex:none;height:56vw;min-height:230px;}
+  }
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <b>🧠 問答・預覽</b>
+  <span>左：手機玩家端　右：中控台（投影畫面）。加入模擬玩家後會自動分 4 組，可以在中控台改</span>
+  <span class="sp"></span>
+  <button id="addBots" disabled>先在左邊進場，再加入其他模擬玩家</button>
+</div>
+<div class="demo-main">
+  <div class="phone"><div id="player"></div></div>
+  <div class="hostbox"><div id="host"></div></div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/quiz-data.js"></script>
+<script src="js/quiz-core.js"></script>
+<script src="js/quiz-store.js"></script>
+<script src="js/quiz-play.js"></script>
+<script src="js/quiz-host.js"></script>
+<script>
+(function () {
+  var B = BINGO_DATA, C = BingoCore, Q = QUIZ_DATA, K = QuizCore;
+  var store = QuizStore.create({ memory: true });          // 預覽版：資料只存在這個頁面裡
+  var botIds = {}, latest = { status: "lobby", index: -1, players: {}, answers: {}, starts: {} }, scheduled = -1;
+
+  QuizGame.mountHost(document.getElementById("host"), store, {});
+  QuizGame.mountPlayer(document.getElementById("player"), store, { persistIdentity: false, isTaken: function (pid) { return !!botIds[pid]; } });
+
+  var addBtn = document.getElementById("addBots");
+
+  function humanExists() { return Object.keys(latest.players).some(function (pid) { return !botIds[pid]; }); }
+  store.subscribe(function (s) {
+    latest = s;
+    if (!Object.keys(s.players).length) botIds = {};
+    var left = B.GUESTS.length - Object.keys(s.players).length;
+    addBtn.disabled = !humanExists() || left <= 0;
+    addBtn.textContent = !humanExists() ? "先在左邊進場，再加入其他模擬玩家" : (left > 0 ? "加入其他 " + left + " 位模擬玩家" : "模擬玩家已全部加入");
+    // 每一題開始時，模擬玩家各自在隨機時間作答（約 65% 會答對）；搶答題：開放後 0.2~4 秒內有一半的人會按
+    if (s.status === "question" && scheduled !== s.index && K.startOf(s, s.index)) {
+      scheduled = s.index;
+      var q = Q.QUESTIONS[s.index], dur = (K.secondsFor(s.index, s) || 12) * 1000, idx = s.index, n = q.options ? q.options.length : 4;
+      if (q.type === "buzz") {
+        Object.keys(botIds).forEach(function (pid) {
+          if (Math.random() < 0.5) return;
+          setTimeout(function () { if (latest.status === "question" && latest.index === idx) store.buzz(pid, idx); }, K.buzzDelay() * 1000 + 200 + Math.random() * 3800);
+        });
+        return;
+      }
+      Object.keys(botIds).forEach(function (pid) {
+        var wait = 700 + Math.random() * Math.max(500, dur - 1500);
+        var pick = function (avoid) {
+          var right = Math.random() < 0.65, choice = q.answer;
+          if (!right) { do { choice = Math.floor(Math.random() * n); } while (choice === q.answer); }
+          return choice;
+        };
+        setTimeout(function () {
+          if (latest.status !== "question" || latest.index !== idx) return;
+          var first = pick(); store.answer(pid, idx, first);
+          if (Math.random() < 0.3) setTimeout(function () {                       // 有些人討論後會改答案
+            if (latest.status !== "question" || latest.index !== idx) return;
+            store.answer(pid, idx, q.answer);
+          }, 600 + Math.random() * Math.max(500, dur - wait - 1500));
+        }, wait);
+      });
+    }
+    if (s.status === "lobby") scheduled = -1;
+  });
+  addBtn.addEventListener("click", function () {
+    B.GUESTS.forEach(function (g, i) {
+      var pid = C.guestId(i);
+      if (!latest.players[pid]) { botIds[pid] = true; store.join(pid, g); }
+    });
+    // 還沒被分組的人（包括我自己和新加入的模擬玩家）先平均分進各組；已經分好的不動，之後可以在中控台改
+    var T = K.teamsOf(latest), cnt = T.count || 4, a = {}, k = 0;
+    Object.keys(T.assign).forEach(function (pid) { if (K.teamOf(latest, pid) >= 0) a[pid] = K.teamOf(latest, pid); });
+    Object.keys(latest.players).sort(function () { return Math.random() - 0.5; }).forEach(function (pid) { if (a[pid] == null) a[pid] = (k++) % cnt; });
+    store.setTeams(cnt, a);
+  });
+})();
+</script>
+</body>
+</html>

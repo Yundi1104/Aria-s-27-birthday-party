@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="js/party-theme.js"></script>
+<title>時程表</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/party.css">
+<link rel="stylesheet" href="css/dark.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/quiz-data.js"></script>
+<script src="js/quiz-core.js"></script>
+<script src="js/quiz-store.js"></script>
+<script src="js/card-data.js"></script>
+<script src="js/card-core.js"></script>
+<script src="js/card-store.js"></script>
+<script src="js/award-data.js"></script>
+<script src="js/award-core.js"></script>
+<script src="js/party-data.js"></script>
+<script src="js/menu-data.js"></script>
+<script src="js/party-pages.js"></script>
+<script>
+  PartyPages.mountSchedule(document.getElementById("app"), {});
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+/* 深色模式（手機畫面：入口頁、時程表、活動資訊、菜單、三個遊戲）。
+   入口頁右上角齒輪切換，存在各自手機上（js/theme.js）；<html data-theme="dark"> 時套用。中控台（投影）不受影響。 */
+
+/* ---------- 顏色變數：只在手機畫面的外框裡換掉 ---------- */
+html[data-theme="dark"] :is(.pg-wrap,.bp-wrap,.pg-set,.pg-dlg){
+  --blue-light:#111a24; --blue-mid:#3a5168; --blue-deep:#8cc4e8; --blue-pale:#1e2c3b;
+  --blue-shadow:rgba(0,0,0,.35);
+  --yellow-light:#5a4a22; --yellow-pale:#3a3220;
+  --gold-text:#f0c75e;
+  --ink:#e6edf4; --white:#1b2531;
+  --ok-pale:#1d3a2b; --danger-pale:#4a2422;
+  --opt-a:#1d3850; --opt-b:#463b1d; --opt-c:#1c3f2e; --opt-d:#482433;
+  --cell-border:#4f6d88; --link-ink:#a6d4f4;
+  --card-bg:#1d2836; --card-bg2:rgba(29,40,54,.94); --dark-text:#1b2430;
+  color:var(--ink);
+}
+html[data-theme="dark"], html[data-theme="dark"] body{background:#111a24;color-scheme:dark;}
+
+/* ---------- 背景圖：蓋一層深色 ---------- */
+html[data-theme="dark"] .bp-wrap{background-color:#111a24;background-image:linear-gradient(rgba(12,18,27,.86),rgba(12,18,27,.86)),url(../images/background.png);}
+html[data-theme="dark"] .pg-wrap{background:#111a24;}
+html[data-theme="dark"] .pg-wrap::before{background-color:#111a24;background-image:linear-gradient(rgba(12,18,27,.86),rgba(12,18,27,.86)),url(../images/background.png);}
+
+/* ---------- 白色的卡片、按鈕 → 深色 ---------- */
+:where(html[data-theme="dark"]) .bp-return,
+:where(html[data-theme="dark"]) .pg-back,
+:where(html[data-theme="dark"]) .bp-note,
+:where(html[data-theme="dark"]) .bp-seg,
+:where(html[data-theme="dark"]) .bp-pill,
+:where(html[data-theme="dark"]) .bp-cell,
+:where(html[data-theme="dark"]) .bp-chip,
+:where(html[data-theme="dark"]) .bp-row,
+:where(html[data-theme="dark"]) .bp-opt,
+:where(html[data-theme="dark"]) .bp-select,
+:where(html[data-theme="dark"]) .bp-input,
+:where(html[data-theme="dark"]) .bp-btn.ghost,
+:where(html[data-theme="dark"]) .pg-btn.ghost,
+:where(html[data-theme="dark"]) .pg-go,
+:where(html[data-theme="dark"]) .qp-rules,
+:where(html[data-theme="dark"]) .qp-bar,
+:where(html[data-theme="dark"]) .qp-result,
+:where(html[data-theme="dark"]) .qp-note2,
+:where(html[data-theme="dark"]) .qp-top3-row,
+:where(html[data-theme="dark"]) .qp-teamres,
+:where(html[data-theme="dark"]) .qp-observe,
+:where(html[data-theme="dark"]) .cp-bar,
+:where(html[data-theme="dark"]) .cp-turn,
+:where(html[data-theme="dark"]) .cp-stage,
+:where(html[data-theme="dark"]) .cp-keep,
+:where(html[data-theme="dark"]) .cp-pl,
+:where(html[data-theme="dark"]) .cp-hrow,
+:where(html[data-theme="dark"]) .cp-room,
+:where(html[data-theme="dark"]) .cp-ctl,
+:where(html[data-theme="dark"]) .cp-pickc,
+:where(html[data-theme="dark"]) .cp-seg button,
+:where(html[data-theme="dark"]) .cp-board,
+:where(html[data-theme="dark"]) .cp-brow,
+:where(html[data-theme="dark"]) .pg-tile,
+:where(html[data-theme="dark"]) .pg-scorebox,
+:where(html[data-theme="dark"]) .tut-cell,
+:where(html[data-theme="dark"]) .tut-chip{background:var(--card-bg2);color:var(--ink);}
+html[data-theme="dark"] .bp-cell.locked{background:rgba(29,40,54,.75);}
+html[data-theme="dark"] .pg-sched{background:rgba(29,40,54,.7);}
+html[data-theme="dark"] .bp-tray{background:rgba(22,31,42,.97);box-shadow:0 -4px 14px rgba(0,0,0,.45);}
+html[data-theme="dark"] .qp-letter{background:rgba(255,255,255,.14);color:var(--ink);}
+html[data-theme="dark"] .qp-img{background:#0d141d;}
+html[data-theme="dark"] :is(.bp-join h1,.pg-head h1){text-shadow:none;}
+
+/* 深色字的按鈕（黃色、杏色底的東西，字保持深色才看得清楚） */
+html[data-theme="dark"] :is(.bp-btn:not(.ghost),.bp-banner,.bp-cell.marked,.bp-cell.inline,.bp-row.marked,.bp-row.inline,.bp-chip.sel,.bp-seg button.on,
+  .pg-btn:not(.ghost),.cp-draw,.cp-turn.mine,.cp-turn.end,.cp-pl.turn,.qp-bonus,.bp-pill.on,.bp-sc-pill){color:var(--dark-text);}
+html[data-theme="dark"] :is(.bp-cell.marked,.bp-cell.inline,.bp-row.marked,.bp-row.inline,.cp-pl.turn) *:not(.red){color:var(--dark-text);}
+html[data-theme="dark"] .cp-pl.turn{background:var(--yellow);}
+/* 深色底白字的東西：原本用 --ink 當底色，深色模式改成固定的深灰藍 */
+html[data-theme="dark"] :is(.bp-toast,.pg-toast,.qp-video,.cp-use,.pg-chip.end){background:#3a4b5e;color:#fff;}
+html[data-theme="dark"] .bp-toast.good{background:var(--ok);}
+/* 撲克牌本身維持白底黑字 */
+html[data-theme="dark"] .pc-card{background:#fff;color:#2b3a4a;border-color:#2b3a4a;}
+html[data-theme="dark"] .pc-card.red{color:#d6455d;}
+/* 紅色花色在深底上亮一點 */
+html[data-theme="dark"] .cp-pl .cd.red{color:#ff7a8e;}
+/* 計分說明的小格子 */
+html[data-theme="dark"] .bp-sc-cell{background:var(--yellow-pale);}
+html[data-theme="dark"] .bp-sc-cell.wide{background:var(--blue-pale);}
+/* 陰影在深色底上要更深一點 */
+html[data-theme="dark"] :is(.cp-turn,.cp-stage,.cp-keep,.cp-pl,.cp-myscore,.cp-board,.cp-brow,.cp-room){box-shadow:0 3px 10px rgba(0,0,0,.45);}
+
+/* ---------- 菜單（卡片格子）、活動資訊底板、簽到視窗 ---------- */
+html[data-theme="dark"] :is(.pg-info){background:rgba(29,40,54,.82);box-shadow:0 3px 10px rgba(0,0,0,.4);}
+html[data-theme="dark"] .mn-sheet{--mn-paper:#1c2733; --mn-blue:#8cc4e8; --mn-soft:#9db4c9; --mn-bad:#e07a70; --mn-warn:#e0b45a;box-shadow:0 6px 22px rgba(0,0,0,.45);}
+html[data-theme="dark"] .mn-ic{background:rgba(140,196,232,.08);}
+html[data-theme="dark"] .mn-ic.has-img{background:transparent;}
+html[data-theme="dark"] .mn-ic.has-img img{filter:drop-shadow(0 3px 0 rgba(0,0,0,.4));}
+html[data-theme="dark"] .pg-dlg-card{background:var(--card-bg);color:var(--ink);}
+html[data-theme="dark"] .pg-dlg-card p{color:var(--blue-deep);}
+html[data-theme="dark"] .pg-manual{background:var(--card-bg);color:var(--ink);}
+html[data-theme="dark"] .tut-cap .big{color:var(--yellow);}
+
+/* ---------- 入口頁右上角的齒輪 + 設定面板 ---------- */
+.pg-inner{position:relative;}
+.pg-gear{position:absolute;top:6px;right:6px;z-index:5;width:38px;height:38px;border-radius:50%;border:2px solid var(--blue-mid);
+  background:rgba(255,255,255,.92);color:var(--blue-deep);font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:0 2px 6px rgba(43,58,74,.18);padding:0;}
+html[data-theme="dark"] .pg-gear{background:rgba(29,40,54,.94);}
+.pg-set{position:fixed;inset:0;z-index:60;background:rgba(10,15,22,.55);display:none;align-items:flex-end;justify-content:center;}
+.pg-set.show{display:flex;}
+.pg-set-in{width:100%;max-width:520px;background:var(--white);color:var(--ink);border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px));animation:bpUp .22s ease-out;}
+.pg-set-in h3{margin:0 0 4px;font-size:18px;}
+.pg-set-in .s{margin:0 0 14px;font-size:13px;opacity:.7;}
+.pg-set-row{font-weight:800;font-size:14px;margin:4px 0 8px;}
+.pg-set-seg{display:flex;gap:8px;margin-bottom:16px;}
+.pg-set-seg button{flex:1;border:2px solid var(--blue-mid);background:var(--blue-pale);color:var(--ink);border-radius:14px;padding:12px 6px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.pg-set-seg button.on{background:var(--yellow);border-color:var(--yellow-border);color:#1b2430;}
+
+html[data-theme="dark"] .pg-locktxt{color:var(--blue-deep);}
