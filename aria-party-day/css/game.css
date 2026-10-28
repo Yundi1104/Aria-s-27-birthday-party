@@ -21,6 +21,9 @@
   --host-shadow:0 3px 10px rgba(43,58,74,.18),0 1px 2px rgba(43,58,74,.14); /* 中控台白色區塊的陰影 */                                                     /* 中控台小卡片裡還沒答的格子 */
 }
 *{box-sizing:border-box;}
+/* 連點 / 狂按不會觸發「點兩下放大」（雙指縮放照常可以）；搶答鈕還另外鎖了文字選取和長按選單 */
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+html{background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
 html,body{margin:0;padding:0;height:100%;color:var(--ink);background:var(--blue-light);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
   -webkit-tap-highlight-color:transparent;}
@@ -30,6 +33,9 @@ button{font-family:inherit;}
 .bp-wrap{position:relative;height:100%;overflow:hidden;background:var(--blue-light) url(../images/background.png) center/cover no-repeat;}
 .bp-scroll{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 8px 30px;}
 .bp-inner{max-width:480px;margin:0 auto;}
+/* 好友冰狗：整張 5×5 格子 + 下方名字不用上下滑就看得到——格子的高度吃掉「畫面剩下的高度」，畫面很矮才會出現捲軸 */
+.bp-scroll.fit{display:flex;flex-direction:column;padding-bottom:0;}
+.bp-scroll.fit>.bp-inner{width:100%;flex:1 1 auto;display:flex;flex-direction:column;min-height:0;}
 
 /* 遊戲畫面左上角的返回鈕（回入口頁） */
 .bp-returnrow{padding:0 2px 6px;}
@@ -74,9 +80,13 @@ button{font-family:inherit;}
 .bp-hint{font-size:12.5px;color:var(--ink);opacity:.7;}
 
 /* 5×5 格子：每一格一樣大（固定比例，內容超出就縮字，不會把格子撐大） */
-.bp-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}
+.bp-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;}
+.bp-scroll.fit .bp-board{flex:1 1 auto;min-height:330px;grid-template-rows:repeat(5,minmax(0,1fr));}
+.bp-scroll.fit .bp-board .bp-cell{aspect-ratio:auto;height:100%;}
+.bp-scroll.fit .bp-tray{margin-bottom:0;flex:0 0 auto;}
+.bp-scroll.fit .bp-banner{padding:5px 10px;font-size:13px;line-height:1.35;margin-bottom:4px;border-radius:11px;box-shadow:0 2px 0 var(--yellow-shadow);}      /* 連成線的橫幅縮小，才不會把格子擠到要捲動 */
 .bp-cell{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;
-  aspect-ratio:1/1.22;min-width:0;min-height:0;overflow:hidden;padding:3px 2px;
+  aspect-ratio:1/1.22;min-width:0;min-height:0;overflow:hidden;padding:2px 1px;
   border:2px solid var(--blue-mid);border-radius:9px;background:#fff;color:var(--ink);
   font-size:clamp(10.5px,2.95vw,12.5px);line-height:1.22;cursor:pointer;}
 /* 換行：只在「|」標好的詞與詞之間換；英數字不會被拆開；盡量讓每行長度平均 */
@@ -100,11 +110,11 @@ button{font-family:inherit;}
 .bp-cell.drop-hover,.bp-row.drop-hover{outline:3px dashed var(--orange);outline-offset:-2px;background:var(--yellow-light);}
 
 /* 下方人名區：固定在畫面底部，拖名字到上面的格子 */
-.bp-tray{position:sticky;bottom:0;z-index:6;margin:12px -8px -30px;padding:10px 8px calc(12px + env(safe-area-inset-bottom,0px));
+.bp-tray{position:sticky;bottom:0;z-index:6;margin:8px -8px -30px;padding:8px 8px calc(10px + env(safe-area-inset-bottom,0px));
   background:rgba(255,253,247,.97);border-radius:18px 18px 0 0;box-shadow:0 -4px 14px rgba(43,58,74,.18);}
-.bp-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
-.bp-chip{height:36px;border:2px solid var(--blue-mid);border-radius:10px;background:#fff;color:var(--ink);
-  font-size:13.5px;font-weight:700;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.bp-chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}          /* 20 個名字排成 5 欄 × 4 列，比 4 欄 × 5 列矮一排 */
+.bp-chip{height:32px;border:2px solid var(--blue-mid);border-radius:9px;background:#fff;color:var(--ink);
+  font-size:12.5px;font-weight:700;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;}
 .bp-chip.used{visibility:hidden;}
 .bp-chip.sel{background:var(--yellow);border-color:var(--yellow-border);}

@@ -21,6 +21,11 @@
 
     host.innerHTML = "";
     var wrap = el("div", { "class": "bp-wrap" });
+    // 手機上狂按時，畫面不要被放大縮小：擋掉 iOS 的捏合 / 雙擊放大（這個遊戲不需要放大）
+    try {
+      ["gesturestart", "gesturechange", "gestureend"].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }, { passive: false }); });
+      document.addEventListener("dblclick", function (e) { e.preventDefault(); }, { passive: false });
+    } catch (e) {}
     var scroll = el("div", { "class": "bp-scroll" });
     var inner = el("div", { "class": "bp-inner" });
     var toast = el("div", { "class": "bp-toast" });
@@ -274,7 +279,10 @@
       var pressed = myBuzz(), rank = K.buzzRank(state, qi, me), j = state.judge && state.judge[qi] ? state.judge[qi][me] : null;
       if (!reveal) {
         if (team < 0) { inner.appendChild(el("div", { "class": "qp-wait", text: "等待揭曉…" })); return; }
-        refs.buzzBtn = el("button", { "class": "qp-buzz" + (pressed ? " done" : ""), type: "button", onclick: pressBuzz }, [
+        // 狂按搶答鈕：用「手一碰到就算」(pointerdown)，並擋掉瀏覽器的雙擊放大／長按選單；click 留給鍵盤和測試
+        refs.buzzBtn = el("button", { "class": "qp-buzz" + (pressed ? " done" : ""), type: "button", onclick: pressBuzz,
+          onpointerdown: function (ev) { if (ev.pointerType === "mouse") return; ev.preventDefault(); pressBuzz(); },
+          oncontextmenu: function (ev) { ev.preventDefault(); } }, [
           el("span", { "class": "qp-buzz-t", text: pressed ? "已按下！" : "搶答" })
         ]);
         refs.buzzMsg = el("div", { "class": "qp-wait" });

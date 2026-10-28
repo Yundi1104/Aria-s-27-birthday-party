@@ -2,7 +2,7 @@
 html,body{height:auto;min-height:100%;}
 /* 背景圖固定在畫面上（頁面很長時往下滑也不會露出底下的純藍色） */
 .pg-wrap{position:relative;min-height:100%;background:var(--blue-light);}
-.pg-wrap::before{content:"";position:fixed;left:0;right:0;top:0;bottom:0;z-index:0;pointer-events:none;background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}
+.pg-wrap::before{content:"";position:fixed;left:0;right:0;top:-120px;bottom:-120px;z-index:0;pointer-events:none;background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}
 .pg-inner{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:14px 14px 44px;}
 
 .pg-bar{display:flex;align-items:center;gap:10px;}

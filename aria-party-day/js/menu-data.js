@@ -34,16 +34,16 @@
     ITEMS: [
       { name: "13吋披薩 4個", sec: "main", tag: "MAIN", emoji: "🍕", img: "images/menu/pizza.webp" },
       { name: "三商炸雞", sec: "snack", tag: "SNACK", emoji: "🍗", img: "images/menu/chicken.webp" },
-      { name: "光頭鬆餅", sec: "sweet", tag: "SWEET", emoji: "🥞" },
       { name: "起司拼盤", sec: "snack", tag: "PLATTER", emoji: "🧀", img: "images/menu/cheese.webp", contents: ["蘋果", "葡萄"], homemade: true },
       { name: "伏特加軟糖", sec: "sweet", tag: "SWEET", emoji: "🍬", img: "images/menu/gummy.webp", contents: ["伏特加", "小熊軟糖"], homemade: true },
       { name: "朗母青檸鳳梨", sec: "drink", tag: "SPECIAL", emoji: "🍍", img: "images/menu/pineapple.webp", homemade: true },
-      { name: "蒜香橄欖油義大利麵", sec: "main", tag: "MAIN", emoji: "🍝", contents: ["橄欖油", "蒜頭", "義大麵"], homemade: true },
+      { name: "蝦子蒜香義大利麵", sec: "main", tag: "MAIN", emoji: "🍝", contents: ["蝦子", "橄欖油", "蒜頭", "義大麵"], homemade: true },
       { name: "散壽司", sec: "main", tag: "MAIN", emoji: "🍣", img: "images/menu/sushi.webp", contents: ["玉子燒", "小黃瓜", "蟹柳絲", "海苔絲"], homemade: true },
       { name: "水果盤", sec: "snack", tag: "FRUIT", emoji: "🍉", img: "images/menu/fruit.webp", contents: ["蘋果切塊", "葡萄", "小蕃茄"], homemade: true },
       { name: "番茄沙沙醬、玉米片", sec: "snack", tag: "SNACK", emoji: "🌽", homemade: true },
       { name: "提拉米蘇", sec: "sweet", tag: "DESSERT", emoji: "🍰" },
       { name: "冷滷味", sec: "snack", tag: "SNACK", emoji: "🍢", contents: ["百頁", "海帶", "豆干", "鳥蛋", "甜不辣"] },
+      { name: "鹽水雞", sec: "snack", tag: "SNACK", emoji: "🍗", contents: ["雞腿", "小黃瓜", "洋蔥", "玉米筍", "高麗菜"] },
       { name: "伏特加", sec: "drink", tag: "DRINK", emoji: "🍸" },
       { name: "蛋糕", sec: "sweet", tag: "DESSERT", emoji: "🎂" },
       { name: "餅乾糖果", sec: "snack", tag: "SNACK", emoji: "🍪" }

@@ -146,12 +146,13 @@
       scoreBox.innerHTML = "";
       var pid = meId();
       if (!pid || !latest.bingo || !latest.quiz || !root.AwardCore) return;
-      var rows = root.AwardCore.combine(latest.bingo, latest.quiz), mine = rows.filter(function (r) { return r.pid === pid; })[0];
+      var rows = root.AwardCore.combine(latest.bingo, latest.quiz, latest.card || undefined), mine = rows.filter(function (r) { return r.pid === pid; })[0];
       if (!mine || mine.total <= 0) return;
+      // 只寫自己各項的分數，不寫名次（名次留到頒獎才揭曉）
       scoreBox.appendChild(el("div", { "class": "pg-scorebox" }, [
         el("div", { "class": "t", text: "🏆 我的成績" }),
-        el("div", { "class": "n", text: "賓果 " + mine.bingo + " ＋ 問答 " + mine.quiz + " ＝ " + mine.total + " 分" }),
-        el("div", { "class": "r", text: "目前第 " + mine.rank + " 名（前 " + root.AWARD_DATA.CONFIG.PRIZE_COUNT + " 名有獎品）" })
+        el("div", { "class": "n", text: "好友冰狗 " + (mine.bingo || 0) + "　迷因海公牛 " + (mine.quiz || 0) + "　陪酒小姐 " + (mine.card || 0) }),
+        el("div", { "class": "r", text: "合計 " + mine.total + " 分" })
       ]));
     }
 

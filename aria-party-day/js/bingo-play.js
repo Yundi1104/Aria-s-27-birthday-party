@@ -31,7 +31,7 @@
 
     host.innerHTML = "";
     var wrap = el("div", { "class": "bp-wrap" });
-    var scroll = el("div", { "class": "bp-scroll" });
+    var scroll = el("div", { "class": "bp-scroll fit" });
     var inner = el("div", { "class": "bp-inner" });
     var mask = el("div", { "class": "bp-mask" });
     var toast = el("div", { "class": "bp-toast" });
