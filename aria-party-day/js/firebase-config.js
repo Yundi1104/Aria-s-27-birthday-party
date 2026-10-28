@@ -6,12 +6,12 @@
  * 拿來先看畫面、試玩都可以；但手機之間不會同步。
  *
  * 設定好之後長這樣：
- * window.FIREBASE_CONFIG = {
- *   apiKey: "AIza...",
- *   authDomain: "你的專案.firebaseapp.com",
- *   databaseURL: "https://你的專案-default-rtdb.asia-southeast1.firebasedatabase.app",
- *   projectId: "你的專案",
- *   appId: "1:123...:web:abc..."
- * };
+ window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA2w6Nhoxqf6MaCeVJ93pVrWgdJWVQK_pE",
+  authDomain: "aria27party.firebaseapp.com",
+  databaseURL: "https://aria27party-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "aria27party",
+  appId: "1:591525469663:web:3c705e14d9f0c5d97bb86a"
+};
  */
 window.FIREBASE_CONFIG = null;
