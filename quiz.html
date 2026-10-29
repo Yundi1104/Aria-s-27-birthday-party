@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script src="js/party-theme.js"></script>
+<title>問答</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/quiz.css">
+<link rel="stylesheet" href="css/dark.css">
+<style>#app{height:100vh;height:100dvh;}</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/quiz-data.js"></script>
+<script src="js/quiz-core.js"></script>
+<script src="js/quiz-store.js"></script>
+<script src="js/quiz-play.js"></script>
+<script src="js/party-data.js"></script>
+<script src="js/party-lock.js"></script>
+<script>
+  if (!PartyLock.guard()) {
+  QuizGame.mountPlayer(document.getElementById("app"), QuizStore.create(), { backHref: "index.html" });
+  }
+</script>
+</body>
+</html>

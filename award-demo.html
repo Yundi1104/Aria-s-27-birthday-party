@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>頒獎 · 預覽 Demo</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/award.css">
+<style>
+  body{display:flex;flex-direction:column;height:100vh;}
+  .demo-bar{flex:0 0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 14px;background:var(--yellow);font-size:14px;}
+  .demo-bar b{font-size:16px;}
+  .demo-bar button,.demo-bar select{border:none;border-radius:99px;padding:7px 16px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);cursor:pointer;}
+  .demo-bar .sp{flex:1;}
+  .hostbox{flex:1;min-height:0;}
+  .hostbox>div{height:100%;}
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <b>🏆 頒獎・預覽</b>
+  <span>（分數是模擬的好友冰狗 + 迷因海公牛 + 陪酒小姐）一進來就是頒獎畫面（不顯示分數）。按「🎁 開始頒獎」或空白鍵一個一個揭曉；想先看總排名按「👀 偷看」</span>
+  <span class="sp"></span>
+  <select id="scn" title="看看同分的時候會怎麼頒獎">
+    <option value="random">情境：模擬的真實分數</option>
+    <option value="tie2">情境：兩人並列第 2 名</option>
+    <option value="tie1">情境：兩人並列第 1 名</option>
+    <option value="tie3b">情境：第 3 名同分（用加賽規則分出先後）</option>
+    <option value="tie3f">情境：第 3 名完全同分（要多一份禮物）</option>
+  </select>
+  <button id="reseed">🎲 換一批分數</button>
+</div>
+<div class="hostbox"><div id="host"></div></div>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/quiz-data.js"></script>
+<script src="js/quiz-core.js"></script>
+<script src="js/quiz-store.js"></script>
+<script src="js/card-data.js"></script>
+<script src="js/card-core.js"></script>
+<script src="js/card-store.js"></script>
+<script src="js/award-data.js"></script>
+<script src="js/award-core.js"></script>
+<script src="js/award-host.js"></script>
+<script src="js/demo-seed.js"></script>
+<script>
+(function () {
+  var bingo = BingoStore.create({ memory: true }), quiz = QuizStore.create({ memory: true }), card = CardStore.create({ memory: true });
+  window.demoStores = { bingo: bingo, quiz: quiz, card: card };
+  var scn = document.getElementById("scn");
+
+  // 假的名單：用來看並列的時候怎麼頒獎
+  function fake(spec) {
+    var names = BINGO_DATA.GUESTS.filter(function (g) { return g !== "Aria"; }).sort(function () { return Math.random() - 0.5; });
+    var rows = spec.map(function (x, i) {
+      return { pid: "f" + i, name: names[i], bingo: x.t - x.q - (x.cd || 0), quiz: x.q, card: x.cd || 0, total: x.t, correct: x.c || 0, lines: x.l || 3, finishedAt: x.f == null ? 1000 + i * 1000 : x.f, rank: 0 };
+    });
+    return AwardCore.rankRows(rows);
+  }
+  var SCN = {
+    tie2:  [{ t: 131, q: 56 }, { t: 112, q: 52 }, { t: 112, q: 41 }, { t: 98, q: 40 }, { t: 90, q: 31 }, { t: 77, q: 31 }],
+    tie1:  [{ t: 124, q: 54 }, { t: 124, q: 50 }, { t: 109, q: 42 }, { t: 98, q: 31 }, { t: 90, q: 31 }, { t: 77, q: 30 }],
+    tie3b: [{ t: 131, q: 56 }, { t: 117, q: 52 }, { t: 104, q: 50 }, { t: 104, q: 41 }, { t: 90, q: 31 }, { t: 77, q: 30 }],
+    tie3f: [{ t: 131, q: 56 }, { t: 117, q: 52 }, { t: 104, q: 41, f: 5000, l: 6, c: 4 }, { t: 104, q: 41, f: 5000, l: 6, c: 4 }, { t: 90, q: 31 }, { t: 77, q: 30 }]
+  };
+  var api = AwardGame.mountHost(document.getElementById("host"), { bingo: bingo, quiz: quiz, card: card }, {
+    rowsProvider: function (b, q, c) { return scn.value === "random" ? AwardCore.combine(b, q, c) : fake(SCN[scn.value]); }
+  });
+
+  function seed() { DemoSeed.seedFinished(bingo, quiz, card); }
+  seed();
+  scn.addEventListener("change", function () { api.refresh(); });
+  document.getElementById("reseed").addEventListener("click", function () { seed(); api.refresh(); });
+})();
+</script>
+</body>
+</html>

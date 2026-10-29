@@ -1,0 +1,226 @@
+/* 陪酒小姐 — 牌面(pc-)、玩家端(cp-)、中控台(ch-)。配色用 game.css 最上面的變數 */
+
+/* ===================== 撲克牌牌面 ===================== */
+.pc-card{--cw:110px;position:relative;flex:0 0 auto;width:var(--cw);height:calc(var(--cw) * 1.42);background:#fff;color:var(--ink);
+  border:2px solid var(--ink);border-radius:calc(var(--cw) * .1);box-shadow:0 4px 10px rgba(43,58,74,.25);}
+.pc-card.red{color:#d6455d;}
+.pc-corner{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:1;}
+.pc-corner b{font-size:calc(var(--cw) * .24);font-weight:800;}
+.pc-corner i{font-style:normal;font-size:calc(var(--cw) * .2);margin-top:2px;}
+.pc-corner.tl{left:calc(var(--cw) * .08);top:calc(var(--cw) * .06);}
+.pc-corner.br{right:calc(var(--cw) * .08);bottom:calc(var(--cw) * .06);transform:rotate(180deg);}
+.pc-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw) * .56);}
+@keyframes pcFlip{from{transform:rotateY(90deg) scale(.8);opacity:.2;}to{transform:none;opacity:1;}}
+
+/* ===================== 玩家端（手機）===================== */
+.cp-tag{flex:1;text-align:right;font-size:13px;font-weight:700;}
+.cp-progress{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;margin-bottom:8px;white-space:nowrap;}
+.cp-bar{flex:1;height:9px;border-radius:99px;background:rgba(255,255,255,.9);border:2px solid var(--blue-mid);overflow:hidden;}
+.cp-fill{height:100%;background:var(--yellow);transition:width .3s;}
+.cp-turn{background:rgba(255,255,255,.92);border-radius:14px;padding:11px 14px;text-align:center;margin-bottom:10px;}
+.cp-turn-main{font-size:19px;font-weight:800;}
+.cp-turn-sub{font-size:13px;opacity:.7;margin-top:2px;}
+.cp-turn.end{background:var(--yellow);font-weight:800;font-size:18px;}
+.cp-draw{display:block;width:100%;border:none;border-radius:18px;padding:18px 12px;font-size:22px;font-weight:800;cursor:pointer;
+  background:var(--yellow);color:var(--ink);box-shadow:0 5px 0 var(--yellow-shadow);margin-bottom:12px;animation:cpPulse 1.1s ease-in-out infinite;}
+.cp-draw:active{transform:translateY(3px);box-shadow:0 2px 0 var(--yellow-shadow);}
+.cp-draw:disabled{opacity:.6;animation:none;}
+@keyframes cpPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+
+.cp-stage{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.92);border-radius:16px;padding:12px;margin-bottom:10px;}
+.cp-stage .pc-card{--cw:100px;}
+.cp-stage.flip .pc-card{animation:pcFlip .45s ease-out;}
+.cp-stage.empty{justify-content:center;opacity:.7;padding:22px;font-size:15px;}
+.cp-info{flex:1;min-width:0;}
+.cp-who{font-size:13px;font-weight:700;opacity:.7;}
+.cp-title{font-size:22px;font-weight:800;margin:2px 0 4px;}
+.cp-text{font-size:15px;line-height:1.55;}
+.cp-extra{margin-top:6px;font-size:13px;font-weight:700;color:var(--gold-text);}
+
+.cp-h{font-size:13px;font-weight:800;opacity:.7;margin:12px 2px 6px;}
+.cp-keep .cp-h{margin-top:2px;}
+.cp-keep{background:rgba(255,255,255,.85);border-radius:14px;padding:9px 12px;margin-bottom:6px;}
+.cp-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.cp-chip{display:inline-flex;align-items:center;gap:8px;background:var(--yellow-pale);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700;}
+.cp-use{border:none;border-radius:99px;background:var(--ink);color:#fff;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+
+.cp-roster{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.cp-pl{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 9px;font-size:14px;font-weight:700;border:2px solid transparent;min-width:0;}
+.cp-pl .no{opacity:.45;font-size:12px;min-width:16px;}
+.cp-pl .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cp-pl .cd{font-size:16px;font-weight:800;}
+.cp-pl .cd.red,.cp-hrow .cd.red{color:#d6455d;}
+.cp-pl.turn{background:var(--yellow);border-color:var(--yellow-border);}
+.cp-pl.me{border-color:var(--blue-deep);}
+.cp-hist{display:flex;flex-direction:column;gap:4px;}
+.cp-hrow{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.85);border-radius:10px;padding:6px 10px;font-size:13.5px;}
+.cp-hrow .n{opacity:.5;min-width:28px;}
+.cp-hrow .nm{flex:0 0 auto;font-weight:700;max-width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cp-hrow .cd{font-weight:800;}
+.cp-hrow .ti{flex:1;text-align:right;opacity:.8;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ===================== 中控台 ===================== */
+.hide-ctl .bh-controls,.hide-ctl .ch-ctl{display:none !important;}
+.ch-main{position:absolute;left:20px;right:20px;top:80px;bottom:16px;display:flex;gap:16px;}
+.ch-main.col{flex-direction:column;gap:6px;}
+.ch-main.row{flex-direction:row;}
+
+/* 開局前 */
+.ch-modes{display:flex;gap:12px;align-items:center;}
+.ch-mode{border:3px solid var(--blue-mid);background:#fff;border-radius:16px;padding:10px 24px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;}
+.ch-mode.on{background:var(--yellow);border-color:var(--yellow-border);}
+.ch-hint{font-size:17px;opacity:.75;margin:4px 2px 4px;}
+.ch-setup{flex:1;min-height:0;display:flex;gap:16px;}
+.ch-setbox{flex:1;min-width:0;overflow:hidden;}
+.ch-setbox h2{margin:0 0 8px;}
+.ch-names{display:grid;grid-template-columns:1fr;gap:6px;}
+.ch-names.two{grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(11,auto);gap:6px 14px;}
+.ch-name{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:5px 14px;font-size:21px;font-weight:700;}
+.ch-name.click{cursor:pointer;}
+.ch-names.two{gap:4px 12px;}
+.ch-names.two .ch-name{padding:3px 12px;font-size:19px;}            /* 21 個名字排成 2 欄 × 11 列，要塞得進一個畫面 */
+.ch-name.click:hover{background:var(--yellow-pale);}
+.ch-name .no{opacity:.4;min-width:26px;font-size:17px;}
+.ch-name .dot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#c8d3dd;}
+.ch-name.on .dot{background:var(--ok);}
+.ch-name .nm{flex:1;min-width:0;}
+
+/* 開始後：每一桌 */
+.ch-table{flex:1;min-width:0;display:flex;gap:16px;}
+.ch-table.narrow{flex-direction:column;gap:8px;background:rgba(255,255,255,.45);border-radius:18px;padding:10px 12px;overflow:hidden;}
+.ch-colL{flex:0 0 640px;min-width:0;display:flex;flex-direction:column;gap:10px;}
+.ch-colR{flex:1;min-width:0;background:rgba(255,255,255,.82);border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;box-shadow:0 2px 0 var(--blue-shadow);}
+.ch-rtitle{font-size:20px;font-weight:800;margin-bottom:8px;}
+
+.ch-thead{display:flex;align-items:center;gap:12px;}
+.ch-tname{font-size:22px;font-weight:800;}
+.ch-tprog{font-size:16px;font-weight:700;opacity:.75;white-space:nowrap;}
+.ch-bar{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.9);border:2px solid var(--blue-mid);overflow:hidden;}
+.ch-fill{height:100%;background:var(--yellow);transition:width .4s;}
+
+.ch-turn{display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--yellow);border-radius:14px;padding:6px 16px;}
+.ch-turn .lab{font-size:20px;font-weight:700;}
+.ch-turn .who{font-size:36px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ch-turn.end{justify-content:center;} .ch-turn.end .who{flex:none;font-size:28px;}
+.ch-ctl{display:inline-flex;gap:8px;}
+.ch-turn .bh-btn{padding:6px 16px;font-size:16px;}
+.ch-turn .bh-btn.primary{background:var(--yellow);color:var(--ink);}
+
+.ch-stage{display:flex;gap:20px;align-items:center;background:rgba(255,255,255,.9);border-radius:16px;padding:12px 18px;box-shadow:0 2px 0 var(--blue-shadow);min-width:0;}
+.ch-stage .pc-card{--cw:150px;animation:pcFlip .45s ease-out;}
+.ch-stage.empty{justify-content:center;opacity:.65;font-size:22px;padding:40px;}
+.ch-info{flex:1;min-width:0;}
+.ch-info .who{font-size:20px;font-weight:700;opacity:.7;}
+.ch-info .ti{font-size:40px;font-weight:800;margin:2px 0 6px;}
+.ch-info .tx{font-size:26px;line-height:1.4;font-weight:600;}
+.ch-info .ex{margin-top:8px;font-size:20px;font-weight:700;color:var(--gold-text);}
+.ch-table.narrow .ch-stage{padding:8px 14px;gap:14px;}
+.ch-table.narrow .ch-stage .pc-card{--cw:104px;}
+.ch-table.narrow .ch-info .who{font-size:16px;} .ch-table.narrow .ch-info .ti{font-size:28px;margin:0 0 3px;}
+.ch-table.narrow .ch-info .tx{font-size:19px;line-height:1.3;} .ch-table.narrow .ch-info .ex{font-size:16px;margin-top:4px;}
+.ch-table.narrow .ch-turn .who{font-size:30px;} .ch-table.narrow .ch-stage.empty{padding:24px;font-size:18px;}
+
+.ch-keep{display:flex;flex-wrap:wrap;gap:8px;min-height:30px;}
+.ch-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:99px;padding:4px 14px;font-size:19px;font-weight:700;}
+.ch-use{border:none;border-radius:99px;background:var(--ink);color:#fff;padding:2px 10px;font-size:14px;font-weight:700;cursor:pointer;}
+.ch-table.narrow .ch-chip{font-size:16px;padding:3px 11px;}
+
+.ch-roster{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:6px 10px;flex:1;min-height:0;}
+.ch-pl{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:2px 12px;font-size:22px;font-weight:700;min-width:0;border:3px solid transparent;}
+.ch-pl .no{opacity:.4;font-size:16px;min-width:22px;}
+.ch-pl .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ch-pl .cd{font-size:24px;font-weight:800;min-width:50px;text-align:right;}
+.ch-pl .cd.red,.ch-hrow .red{color:#d6455d;}
+.ch-pl.turn{background:var(--yellow);border-color:var(--ink);}
+.ch-pl.off{opacity:.55;}
+.ch-table.narrow .ch-pl{font-size:19px;padding:1px 10px;} .ch-table.narrow .ch-pl .cd{font-size:20px;}
+
+.ch-hist{display:flex;flex-direction:column;min-height:0;}
+.ch-hrow{display:flex;justify-content:space-between;gap:12px;font-size:18px;padding:3px 4px;border-bottom:1px dashed var(--blue-mid);}
+.ch-hrow span:first-child{flex:1;min-width:0;}
+.ch-hrow .red{color:#d6455d;font-weight:800;}
+
+/* 自由開局設定 */
+.ch-variants{display:flex;align-items:center;gap:10px;margin-top:6px;}
+.ch-variants .lab{font-size:18px;font-weight:700;}
+.ch-mode.sm{padding:5px 16px;font-size:18px;border-radius:12px;}
+.ch-name.picked{background:var(--yellow);}
+.ch-name.picked .no{opacity:1;font-weight:800;}
+.bh-empty{font-size:18px;opacity:.6;padding:6px 0;}
+
+/* 手機：主遊戲 / 自由開局 分頁、開桌、房間列表 */
+.cp-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.cp-tab{flex:1;position:relative;border:2px solid var(--blue-mid);background:rgba(255,255,255,.9);color:var(--blue-deep);border-radius:12px;
+  padding:9px 6px;font-size:15px;font-weight:800;cursor:pointer;}
+.cp-tab.on{background:var(--yellow);border-color:var(--yellow-border);color:var(--ink);}
+.cp-dot{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;border-radius:50%;
+  background:var(--danger);color:#fff;font-size:12px;font-weight:800;vertical-align:middle;}
+.cp-room{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;background:rgba(255,255,255,.92);border:2px solid var(--blue-mid);
+  border-radius:14px;padding:11px 14px;margin-bottom:8px;cursor:pointer;color:var(--ink);}
+.cp-room .t1{font-size:16px;font-weight:800;} .cp-room .t2{font-size:13px;opacity:.75;}
+.cp-room.turn{background:var(--yellow);border-color:var(--yellow-border);}
+.cp-room.over{opacity:.65;}
+.cp-roomhead{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.cp-roomhead .t{flex:1;text-align:right;font-size:13px;font-weight:700;}
+.cp-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:6px;background:rgba(255,255,255,.85);border-radius:12px;padding:8px 10px;margin-bottom:8px;}
+.cp-ctl .lab{font-size:12.5px;font-weight:700;opacity:.7;}
+.cp-mini{border:none;border-radius:99px;background:var(--blue-deep);color:#fff;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;}
+.cp-mini.danger{background:var(--danger);}
+.cp-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.cp-pickc{display:flex;align-items:center;gap:6px;border:2px solid var(--blue-mid);background:rgba(255,255,255,.95);border-radius:10px;padding:7px 8px;
+  font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;min-width:0;}
+.cp-pickc .no{flex:0 0 auto;min-width:18px;height:18px;border-radius:50%;font-size:12px;display:inline-flex;align-items:center;justify-content:center;}
+.cp-pickc .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
+.cp-pickc.on{background:var(--yellow);border-color:var(--yellow-border);}
+.cp-pickc.on .no{background:var(--ink);color:var(--yellow);}
+.cp-quick{display:flex;gap:14px;margin:6px 2px 0;}
+.cp-seg{display:flex;gap:6px;}
+.cp-seg button{flex:1;border:2px solid var(--blue-mid);background:rgba(255,255,255,.95);border-radius:12px;padding:9px 6px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;}
+.cp-seg button.on{background:var(--yellow);border-color:var(--yellow-border);}
+.cp-note2{font-size:12.5px;opacity:.7;margin:6px 2px 12px;}
+.cp-tabs + .bp-btn{margin-top:2px;}
+
+/* 分數 */
+.ch-stepper{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:700;background:#fff;border-radius:99px;padding:4px 10px;}
+.ch-stepper b{min-width:24px;text-align:center;font-size:26px;}
+.ch-step{width:34px;height:34px;border-radius:50%;border:none;background:var(--yellow);font-size:22px;font-weight:800;cursor:pointer;color:var(--ink);line-height:1;}
+.ch-variants .lab.gap{margin-left:18px;}
+.ch-name .tg{flex:0 0 auto;font-size:15px;font-weight:800;opacity:.7;margin-left:6px;}
+.ch-ords{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0;}
+.ch-info .pts{font-size:34px;font-weight:800;color:var(--ok);line-height:1.1;}
+.ch-info .pts.no{font-size:20px;color:#8a95a0;}
+.ch-pl .pt{flex:0 0 auto;min-width:38px;text-align:right;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gold-text);}
+.ch-board{background:rgba(255,255,255,.9);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.ch-board .bt{font-size:22px;font-weight:800;}
+.ch-board .br{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:700;}
+.ch-board .br .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ch-board .br .pt{font-variant-numeric:tabular-nums;color:var(--gold-text);}
+.ch-board .rk{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:var(--blue-pale);}
+.ch-board .rk.r1{background:var(--yellow);} .ch-board .rk.r2{background:#e3e8ee;} .ch-board .rk.r3{background:var(--orange);}
+
+/* 手機：分數 */
+.cp-myscore{margin:0 0 8px;padding:8px 12px;border-radius:12px;background:var(--yellow-pale);border:2px solid var(--yellow);font-size:14px;text-align:center;}
+.cp-myscore b{font-size:20px;font-weight:800;}
+.cp-pts{font-size:22px;font-weight:800;color:var(--ok);}
+.cp-pts.no{font-size:14px;color:#8a95a0;font-weight:700;}
+.cp-pl .pt{flex:0 0 auto;min-width:30px;text-align:right;font-weight:800;color:var(--gold-text);font-variant-numeric:tabular-nums;}
+.cp-board{margin-top:6px;}
+.cp-brow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.92);border-radius:12px;padding:9px 12px;margin-bottom:6px;font-size:16px;font-weight:700;}
+.cp-brow.me{background:var(--yellow-pale);}
+.cp-brow .rk{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.cp-brow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cp-brow .pt{color:var(--gold-text);}
+
+/* ===== 第五輪：輪到自己的遮罩、陰影、輪流只顯示撲克牌 ===== */
+/* 輪到自己：整個畫面蓋上半透明黑色，中間偏下出現抽牌按鈕 */
+.cp-turnov{display:none;position:absolute;inset:0;z-index:30;background:rgba(15,20,28,.62);align-items:flex-end;justify-content:center;padding:0 22px 22vh;animation:cpOvIn .25s ease-out;}
+.cp-turnov.show{display:flex;}
+.cp-turnov-in{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.cp-turnov-t{color:#fff;font-size:30px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,.35);}
+.cp-turnov .cp-draw{font-size:26px;padding:20px 12px;}
+@keyframes cpOvIn{from{opacity:0;}to{opacity:1;}}
+.cp-turn.mine{background:var(--yellow);}
+/* 白色區塊加陰影，跟淺色背景分開 */
+.cp-turn,.cp-stage,.cp-keep,.cp-pl,.cp-myscore,.cp-board,.cp-brow,.cp-room{box-shadow:0 3px 10px rgba(43,58,74,.16),0 1px 2px rgba(43,58,74,.12);}
+.ch-tcap{font-size:14px;font-weight:700;opacity:.6;white-space:nowrap;}
+.ch-roster{min-height:0;overflow:hidden;}

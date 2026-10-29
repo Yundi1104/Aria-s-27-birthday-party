@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社交賓果 · 中控台</title>
+<link rel="stylesheet" href="css/game.css">
+<style>#app{height:100vh;}</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/bingo-play.js"></script>
+<script src="js/host-auth.js"></script>
+<script src="js/bingo-host.js"></script>
+<script>
+  BingoGame.mountHost(document.getElementById("app"), BingoStore.create(), { pin: BINGO_DATA.CONFIG.HOST_PIN, backHref: "host-index.html" });
+</script>
+</body>
+</html>

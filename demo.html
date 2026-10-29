@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="js/party-theme.js"></script>
+<title>社交賓果 · 預覽 Demo</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/dark.css">
+<style>
+  body{display:flex;flex-direction:column;height:100vh;}
+  .demo-bar{flex:0 0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 14px;background:var(--yellow);font-size:14px;}
+  .demo-bar b{font-size:16px;}
+  .demo-bar button,.demo-bar select{border:none;border-radius:99px;padding:7px 16px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);cursor:pointer;}
+  .demo-bar button:disabled{opacity:.45;cursor:not-allowed;}
+  .demo-bar .sp{flex:1;}
+  .demo-main{flex:1;min-height:0;display:flex;gap:16px;padding:14px;align-items:stretch;}
+  .phone{flex:0 0 392px;max-height:820px;align-self:center;height:100%;border:9px solid var(--ink);border-radius:34px;overflow:hidden;background:#fff;position:relative;}
+  .phone>div{height:100%;}
+  .hostbox{flex:1;min-width:0;border-radius:14px;overflow:hidden;border:3px solid var(--ink);}
+  .hostbox>div{height:100%;}
+  @media (max-width:980px){
+    body{height:auto;}
+    .demo-main{flex-direction:column;}
+    .demo-main{padding:0;gap:10px;}
+    .phone{flex:none;width:100%;max-width:480px;height:min(820px,100vh);align-self:center;border:none;border-radius:0;}
+    .hostbox{flex:none;height:56vw;min-height:230px;}
+  }
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <b>🎉 社交賓果・預覽</b>
+  <span>左：手機玩家端　右：中控台（投影畫面）</span>
+  <span class="sp"></span>
+  <button id="addBots" disabled>先在左邊簽到，再加入其他模擬玩家</button>
+  <select id="speed" title="模擬玩家答題速度"><option value="1200">模擬速度：慢</option><option value="600" selected>模擬速度：中</option><option value="250">模擬速度：快</option></select>
+</div>
+<div class="demo-main">
+  <div class="phone"><div id="player"></div></div>
+  <div class="hostbox"><div id="host"></div></div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/bingo-play.js"></script>
+<script src="js/bingo-host.js"></script>
+<script>
+(function () {
+  var D = BINGO_DATA, C = BingoCore;
+  var store = BingoStore.create({ memory: true });   // 預覽版：資料只存在這個頁面裡
+  var botIds = {}, latest = { status: "lobby", players: {} }, timer = null;
+
+  BingoGame.mountHost(document.getElementById("host"), store, {});
+  window.demoPlayer = BingoGame.mountPlayer(document.getElementById("player"), store, { persistIdentity: false, isTaken: function (pid) { return !!botIds[pid]; } });
+
+  var addBtn = document.getElementById("addBots"), speed = document.getElementById("speed");
+  function humanExists() { return Object.keys(latest.players).some(function (pid) { return !botIds[pid]; }); }
+  store.subscribe(function (s) {
+    latest = s;
+    if (!Object.keys(s.players).length) botIds = {};
+    var left = D.GUESTS.length - Object.keys(s.players).length;
+    addBtn.disabled = !humanExists() || left <= 0;
+    addBtn.textContent = !humanExists() ? "先在左邊簽到，再加入其他模擬玩家" : (left > 0 ? "加入其他 " + left + " 位模擬玩家" : "模擬玩家已全部加入");
+  });
+  addBtn.addEventListener("click", function () {
+    var cin = C.checkinCell();
+    D.GUESTS.forEach(function (g, i) {
+      var pid = C.guestId(i);
+      if (!latest.players[pid]) { botIds[pid] = true; store.join(pid, g, C.makeOrder(pid), cin ? cin.id : null); }
+    });
+  });
+
+  function tick() {
+    if (latest.status !== "playing") return;
+    var ids = Object.keys(botIds).filter(function (pid) { return latest.players[pid]; });
+    for (var k = 0; k < 2 && ids.length; k++) {
+      var pid = ids[Math.floor(Math.random() * ids.length)], p = latest.players[pid];
+      var left = p.order.filter(function (id) { return !p.marked[id]; });
+      if (!left.length) continue;
+      store.mark(pid, left[Math.floor(Math.random() * left.length)]);
+    }
+  }
+  function restart() { clearInterval(timer); timer = setInterval(tick, Number(speed.value)); }
+  speed.addEventListener("change", restart); restart();
+})();
+</script>
+</body>
+</html>

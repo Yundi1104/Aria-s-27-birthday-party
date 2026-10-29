@@ -1,0 +1,398 @@
+/* 社交賓果 — 玩家端(bp-) 與 中控台(bh-) 共用樣式。顏色沿用邀請函：淺藍為底、亮黃為重點 */
+:root{
+  /* ===== 配色都集中在這裡，要換配色只改這一區 ===== */
+  --blue-light:#cfe8f7; --blue-mid:#a9d8f2; --blue-deep:#5b8fb0; --blue-pale:#e8f4fb;
+  --blue-shadow:rgba(91,143,176,.3);
+  /* 黃色：從亮黃 #ffc800 調成柔和的奶油黃，比較不刺眼 */
+  --yellow:#ffd966; --yellow-light:#ffe9a8; --yellow-pale:#fff6d9;
+  --yellow-border:#e6b94a; --yellow-shadow:#d6aa3c; --yellow-glow:rgba(255,217,102,.4);
+  /* 連成線的格子：從橘色調成柔和的杏色 */
+  --orange:#f6b070; --orange-border:#dd8f4a;
+  --gold-text:#8a6a24;
+  --ink:#2b3a4a; --white:#fffdf7; --danger:#e0554f; --ok:#35a56b;
+  --ok-pale:#d9f3e4; --danger-pale:#fbdcda;
+  /* 問答四個選項的底色（A B C D） */
+  --opt-a:#d6eaf8; --opt-b:#fff0bd; --opt-c:#d6f0e2; --opt-d:#fbe0e7;
+  --stage-bg:linear-gradient(160deg,#cfe8f7 0%,#e6f3fb 60%,#fff8e3 100%);   /* 中控台背景 */
+  --stage-edge:#1d2a38;                                                     /* 中控台外框（螢幕比例不同時的邊） */
+  --mini-empty:#e3edf5;
+  --cell-border:#6fa3c8;                                                    /* 好友冰狗格子、名字的邊框（比 --blue-mid 深一點） */
+  --link-ink:#1f4a6b;                                                       /* 手機上「教學」「計分」這類小字連結 */
+  --host-shadow:0 3px 10px rgba(43,58,74,.18),0 1px 2px rgba(43,58,74,.14); /* 中控台白色區塊的陰影 */                                                     /* 中控台小卡片裡還沒答的格子 */
+}
+*{box-sizing:border-box;}
+/* 連點 / 狂按不會觸發「點兩下放大」（雙指縮放照常可以）；搶答鈕還另外鎖了文字選取和長按選單 */
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+html{background:var(--blue-light) url(../images/background-tile.jpg) center top/100% auto repeat-y;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
+html,body{margin:0;padding:0;height:100%;color:var(--ink);background:var(--blue-light);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  -webkit-tap-highlight-color:transparent;}
+button{font-family:inherit;}
+
+/* ===================== 玩家端 ===================== */
+.bp-wrap{position:relative;height:100%;overflow:hidden;background:var(--blue-light) url(../images/background.png) center/cover no-repeat;}
+.bp-scroll{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 8px 30px;}
+.bp-inner{max-width:480px;margin:0 auto;}
+/* 好友冰狗：整張 5×5 格子 + 下方名字不用上下滑就看得到——格子的高度吃掉「畫面剩下的高度」，畫面很矮才會出現捲軸 */
+.bp-scroll.fit{display:flex;flex-direction:column;padding-bottom:0;}
+.bp-scroll.fit>.bp-inner{width:100%;flex:1 1 auto;display:flex;flex-direction:column;min-height:0;}
+
+/* 遊戲畫面左上角的返回鈕（回入口頁） */
+.bp-returnrow{padding:0 2px 6px;}
+.bp-return{display:inline-block;color:var(--blue-deep);font-weight:800;font-size:13px;line-height:1.2;text-decoration:none;background:rgba(255,255,255,.92);border-radius:99px;padding:4px 12px;border:2px solid var(--blue-mid);cursor:pointer;}
+.bp-return.mini{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;padding:0 0 3px;font-size:22px;line-height:1;border-radius:50%;}
+
+.bp-btn{display:flex;align-items:center;justify-content:center;width:100%;border:none;border-radius:999px;
+  padding:13px 22px;font-size:16px;font-weight:700;cursor:pointer;background:var(--yellow);color:var(--ink);
+  box-shadow:0 3px 0 var(--yellow-shadow);}
+.bp-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--yellow-shadow);}
+.bp-btn:disabled{opacity:.55;cursor:not-allowed;}
+.bp-btn.ghost{background:#fff;box-shadow:0 3px 0 var(--blue-mid);color:var(--blue-deep);}
+
+.bp-join{padding:12vh 8px 0;text-align:center;}
+.bp-join h1{margin:0 0 6px;font-size:28px;color:var(--blue-deep);text-shadow:1px 1px 0 #fff;}
+.bp-join p{margin:0 0 22px;font-size:14.5px;line-height:1.7;}
+.bp-join label{display:block;text-align:left;font-weight:700;font-size:14px;margin-bottom:6px;}
+.bp-select,.bp-input{width:100%;border:2px solid var(--blue-mid);border-radius:10px;padding:11px 12px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);margin-bottom:14px;}
+.bp-select:focus,.bp-input:focus{outline:none;border-color:var(--yellow);}
+
+/* 第一列：名字｜連線進度｜換人 */
+.bp-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;padding:0 2px;}
+.bp-who{font-weight:800;font-size:16px;white-space:nowrap;}
+.bp-progress{flex:1;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap;}
+.bp-pills{flex:1;display:flex;gap:4px;}
+.bp-pill{flex:1;height:9px;border-radius:99px;background:rgba(255,255,255,.9);border:2px solid var(--blue-mid);}
+.bp-pill.on{background:var(--yellow);border-color:var(--yellow-border);}
+.bp-link{background:none;border:none;color:var(--blue-deep);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:4px 2px;}
+.bp-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:5px;}
+.bp-dot.off{background:var(--danger);}
+
+.bp-banner{background:var(--yellow);border-radius:14px;padding:10px 12px;font-weight:700;font-size:15px;text-align:center;
+  margin-bottom:6px;box-shadow:0 3px 0 var(--yellow-shadow);}
+.bp-note{background:rgba(255,255,255,.9);border-radius:12px;padding:9px 12px;font-size:14px;text-align:center;margin-bottom:6px;line-height:1.5;}
+
+/* 格子 / 清單 切換 */
+.bp-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 2px;}
+.bp-seg{display:inline-flex;background:rgba(255,255,255,.9);border-radius:99px;padding:3px;border:2px solid var(--blue-mid);}
+.bp-seg button{border:none;background:none;border-radius:99px;padding:4px 16px;font-size:13.5px;font-weight:700;color:var(--blue-deep);cursor:pointer;}
+.bp-seg button.on{background:var(--yellow);color:var(--ink);}
+.bp-hint{font-size:12.5px;color:var(--ink);opacity:.7;}
+
+/* 5×5 格子：每一格一樣大（固定比例，內容超出就縮字，不會把格子撐大） */
+.bp-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;}
+.bp-scroll.fit .bp-board{flex:1 1 auto;min-height:330px;grid-template-rows:repeat(5,minmax(0,1fr));}
+.bp-scroll.fit .bp-board .bp-cell{aspect-ratio:auto;height:100%;}
+.bp-scroll.fit .bp-tray{margin-bottom:0;flex:0 0 auto;}
+.bp-scroll.fit .bp-banner{padding:5px 10px;font-size:13px;line-height:1.35;margin-bottom:4px;border-radius:11px;box-shadow:0 2px 0 var(--yellow-shadow);}      /* 連成線的橫幅縮小，才不會把格子擠到要捲動 */
+.bp-cell{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;
+  aspect-ratio:1/1.22;min-width:0;min-height:0;overflow:hidden;padding:2px 1px;
+  border:2px solid var(--blue-mid);border-radius:9px;background:#fff;color:var(--ink);
+  font-size:clamp(10.5px,2.95vw,12.5px);line-height:1.22;cursor:pointer;}
+/* 換行：只在「|」標好的詞與詞之間換；英數字不會被拆開；盡量讓每行長度平均 */
+.bp-q{display:block;width:100%;text-align:center;text-wrap:balance;overflow-wrap:anywhere;}
+.bp-ck{display:inline-block;}
+/* 答完的格子：名字大、題目小；點一下翻到背面看完整題目 */
+.bp-front,.bp-back{display:block;width:100%;}
+.bp-ans{display:block;width:100%;overflow-wrap:anywhere;font-size:1.32em;font-weight:800;line-height:1.15;}
+.bp-sub{display:block;width:100%;margin-top:4px;font-size:.7em;font-weight:400;line-height:1.2;opacity:.8;}
+.bp-sub .bp-q{width:100%;}
+.bp-cell.marked .bp-back{font-weight:700;}
+.bp-cell.marked:not(.flipped) .bp-back{display:none;}
+.bp-cell.marked.flipped .bp-front{display:none;}
+.bp-cell.flipping .bp-front,.bp-cell.flipping .bp-back{animation:bpFlipIn .3s ease-out;}
+@keyframes bpFlipIn{from{transform:rotateY(90deg) scale(.9);opacity:.2;}to{transform:none;opacity:1;}}
+.bp-cell:active{transform:scale(.97);}
+.bp-cell.marked{background:var(--yellow);border-color:var(--yellow-border);}
+.bp-cell.inline{background:var(--orange);border-color:var(--orange-border);color:var(--ink);}
+.bp-cell.locked{background:rgba(255,255,255,.75);color:var(--blue-deep);font-size:22px;cursor:default;}
+.bp-cell.view,.bp-row.view{cursor:default;}
+.bp-cell.drop-hover,.bp-row.drop-hover{outline:3px dashed var(--orange);outline-offset:-2px;background:var(--yellow-light);}
+
+/* 下方人名區：固定在畫面底部，拖名字到上面的格子 */
+.bp-tray{position:sticky;bottom:0;z-index:6;margin:8px -8px -30px;padding:8px 8px calc(10px + env(safe-area-inset-bottom,0px));
+  background:rgba(255,253,247,.97);border-radius:18px 18px 0 0;box-shadow:0 -4px 14px rgba(43,58,74,.18);}
+.bp-chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}          /* 20 個名字排成 5 欄 × 4 列，比 4 欄 × 5 列矮一排 */
+.bp-chip{height:32px;border:2px solid var(--blue-mid);border-radius:9px;background:#fff;color:var(--ink);
+  font-size:12.5px;font-weight:700;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;}
+.bp-chip.used{visibility:hidden;}
+.bp-chip.sel{background:var(--yellow);border-color:var(--yellow-border);}
+.bp-chip.dragging{opacity:.35;}
+.bp-ghost{position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-50%) scale(1.1);
+  padding:8px 16px;border-radius:12px;background:var(--yellow);border:2px solid var(--yellow-border);color:var(--ink);
+  font-size:16px;font-weight:800;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.3);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;}
+
+/* 清單檢視：一題一列，字大好讀 */
+.bp-list{display:flex;flex-direction:column;gap:6px;}
+.bp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;width:100%;
+  padding:12px 14px;border:2px solid var(--blue-mid);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer;
+  font-size:15px;line-height:1.4;}
+.bp-row:active{transform:scale(.99);}
+.bp-row-q{flex:1;min-width:0;}
+.bp-row-a{flex:0 0 auto;font-weight:800;font-size:16px;color:var(--blue-deep);}
+.bp-row.marked{background:var(--yellow);border-color:var(--yellow-border);cursor:default;}
+.bp-row.marked .bp-row-q{font-size:13px;opacity:.7;}
+.bp-row.marked .bp-row-a{color:var(--ink);}
+.bp-row.inline{background:var(--orange);border-color:var(--orange-border);color:var(--ink);}
+.bp-row.inline .bp-row-a{color:var(--ink);}
+
+/* 答題面板（從下面滑出） */
+.bp-mask{position:absolute;inset:0;background:rgba(43,58,74,.5);display:none;align-items:flex-end;z-index:20;}
+.bp-mask.show{display:flex;}
+.bp-sheet{width:100%;background:var(--white);border-radius:22px 22px 0 0;padding:20px 18px 26px;
+  animation:bpUp .22s ease-out;max-width:520px;margin:0 auto;}
+@keyframes bpUp{from{transform:translateY(40px);opacity:.4;}to{transform:none;opacity:1;}}
+.bp-sheet h3{margin:0 0 14px;font-size:18px;line-height:1.5;}
+.bp-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
+.bp-opt{width:100%;padding:14px 16px;border:2px solid var(--blue-mid);border-radius:12px;background:#fff;color:var(--ink);
+  font-size:17px;font-weight:700;text-align:center;cursor:pointer;}
+.bp-opt:active{background:var(--yellow-light);border-color:var(--yellow);}
+.bp-sheet .bp-btn{margin-top:2px;}
+.bp-sheet .bp-btn.ghost{margin-top:10px;}
+.bp-shake{animation:bpShake .4s;}
+@keyframes bpShake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-6px);}40%,60%{transform:translateX(6px);}}
+
+.bp-toast{position:absolute;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+  padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:30;white-space:nowrap;}
+.bp-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.bp-toast.good{background:var(--ok);}
+
+/* ===================== 中控台（固定 1280×720，再縮放到符合螢幕）===================== */
+.bh-viewport{position:relative;width:100%;height:100%;overflow:hidden;background:var(--stage-edge);}
+.bh-stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:top left;overflow:hidden;
+  background:var(--stage-bg);}
+.bh-header{position:absolute;left:0;top:0;right:0;height:64px;background:var(--yellow);display:flex;align-items:center;
+  padding:0 24px;gap:18px;box-shadow:0 3px 0 var(--yellow-shadow);z-index:5;}
+.bh-titlebox{line-height:1.1;}
+.bh-title{font-size:27px;font-weight:800;letter-spacing:1px;}
+.bh-sub{font-size:15px;font-weight:700;opacity:.75;margin-top:3px;}
+.bh-clock{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;background:#fff;color:var(--ink);border-radius:14px;
+  padding:1px 16px;min-width:150px;text-align:center;}
+.bh-clock:empty{display:none;}
+.bh-clock.run{background:var(--ink);color:var(--yellow);}
+.bh-clock.low{background:var(--danger);color:#fff;animation:bhPulse 1s ease-in-out infinite;}
+.bh-clock.done{opacity:.75;}
+@keyframes bhPulse{50%{transform:scale(1.07);}}
+.bh-chip{background:#fff;border-radius:99px;padding:5px 16px;font-size:18px;font-weight:700;}
+.bh-chip.playing{background:var(--ok);color:#fff;}
+.bh-chip.ended{background:var(--ink);color:#fff;}
+.bh-stat{font-size:18px;font-weight:700;}
+.bh-spacer{flex:1;}
+.bh-controls{display:flex;gap:8px;align-items:center;}
+.bh-controls.hidden{display:none;}
+/* 「‹ 中控台」回主持人入口的按鈕（四個中控台都有；輸入密碼的畫面左上角也有） */
+a.bh-btn{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;}
+.bh-back{background:rgba(255,255,255,.72);color:var(--blue-deep);}
+.bh-pin .bh-back{position:absolute;left:18px;top:18px;background:#fff;}
+.bh-btn{border:none;border-radius:99px;padding:8px 16px;font-size:16px;font-weight:700;cursor:pointer;background:#fff;color:var(--ink);}
+.bh-btn.primary{background:var(--ink);color:#fff;}
+.bh-btn.danger.armed{background:var(--danger);color:#fff;}
+.bh-btn:disabled{opacity:.4;cursor:not-allowed;}
+.bh-conn{font-size:13px;font-weight:700;}
+
+.bh-main{position:absolute;left:20px;right:20px;top:80px;bottom:16px;display:flex;gap:18px;}
+.bh-grid{flex:0 0 880px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:9px;}
+.bh-card{position:relative;background:#fff;border-radius:14px;border:3px solid transparent;padding:7px 8px 8px;
+  display:flex;flex-direction:column;align-items:center;cursor:pointer;box-shadow:0 2px 0 var(--blue-shadow);overflow:hidden;}
+.bh-card.empty{background:rgba(255,255,255,.45);box-shadow:none;cursor:default;}
+.bh-card.empty .bh-name{opacity:.45;}
+.bh-card.done{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),0 3px 0 var(--yellow-shadow);}
+.bh-card-top{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:4px;}
+.bh-name{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bh-badge{flex:0 0 auto;font-size:13px;font-weight:800;border-radius:99px;padding:1px 9px;background:var(--blue-light);color:var(--blue-deep);}
+.bh-badge.n1{background:var(--blue-pale);}
+.bh-badge.n2{background:var(--yellow-light);color:var(--gold-text);}
+.bh-badge.n3{background:var(--orange);color:var(--ink);}
+.bh-badge.rank{background:var(--ink);color:var(--yellow);}
+.bh-mini{display:grid;grid-template-columns:repeat(5,19px);grid-auto-rows:19px;gap:2px;}
+.bh-cell{border-radius:4px;background:var(--mini-empty);}
+.bh-cell.on{background:var(--yellow);}
+.bh-cell.line{background:var(--orange);}
+
+.bh-side{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0;}
+.bh-panel{background:rgba(255,255,255,.82);border-radius:16px;padding:14px 16px;box-shadow:0 2px 0 var(--blue-shadow);}
+.bh-panel h2{margin:0 0 8px;font-size:20px;}
+.bh-rank-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:20px;font-weight:700;border-bottom:1px dashed var(--blue-mid);}
+.bh-rank-row:last-child{border-bottom:none;}
+.bh-rank-no{width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;}
+.bh-rank-row .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bh-rank-row .ts{flex:0 0 auto;font-size:16px;font-weight:600;opacity:.65;font-variant-numeric:tabular-nums;}
+.bh-rank-row .pt{color:var(--gold-text);font-size:22px;}
+.bh-empty{font-size:16px;opacity:.6;padding:6px 0;}
+.bh-chase{display:flex;justify-content:space-between;font-size:17px;padding:3px 0;}
+.bh-chase span:last-child{opacity:.7;}
+.bh-hint{font-size:13px;opacity:.6;text-align:center;}
+
+.bh-banner{position:absolute;left:50%;top:78px;transform:translateX(-50%);background:var(--ink);color:var(--yellow);
+  font-size:30px;font-weight:800;border-radius:99px;padding:12px 34px;z-index:8;white-space:nowrap;
+  box-shadow:0 6px 24px rgba(0,0,0,.3);animation:bhBan 5s ease forwards;}
+@keyframes bhBan{0%{transform:translateX(-50%) translateY(-80px);opacity:0;}8%{transform:translateX(-50%);opacity:1;}88%{opacity:1;}100%{opacity:0;transform:translateX(-50%) translateY(-20px);}}
+
+.bh-modal{position:absolute;inset:0;background:rgba(43,58,74,.6);display:flex;align-items:center;justify-content:center;z-index:10;}
+.bh-modal-in{width:900px;background:var(--white);border-radius:20px;padding:18px 22px 20px;}
+.bh-modal-in h2{margin:0 0 10px;font-size:24px;display:flex;justify-content:space-between;align-items:center;}
+.bh-modal-in h2 small{font-size:15px;font-weight:400;opacity:.6;}
+.bh-big{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.bh-bigcell{min-height:104px;border-radius:10px;border:2px solid var(--blue-mid);background:#fff;padding:5px;font-size:14px;line-height:1.35;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;word-break:break-all;}
+.bh-bigcell.on{background:var(--yellow);border-color:var(--yellow-border);}
+.bh-bigcell.line{background:var(--orange);border-color:var(--orange-border);color:var(--ink);}
+.bh-bigcell b{font-size:17px;margin-top:3px;}
+.bh-bigcell .bp-q{width:auto;}
+
+.bh-pin{position:absolute;inset:0;background:var(--stage-edge);display:flex;align-items:center;justify-content:center;z-index:20;}
+.bh-pin form{background:var(--white);border-radius:18px;padding:26px 30px;text-align:center;min-width:300px;}
+.bh-pin h2{margin:0 0 14px;}
+.bh-pin input{width:100%;font-size:20px;padding:10px 12px;border:2px solid var(--blue-mid);border-radius:10px;margin-bottom:12px;text-align:center;}
+.bh-pin .err{color:var(--danger);font-size:14px;min-height:20px;margin-bottom:6px;}
+
+.mode-banner{background:var(--yellow-pale);color:var(--gold-text);font-size:12.5px;text-align:center;padding:5px 8px;}
+
+/* 好友冰狗中控台：每連成一條線的特效 */
+.bh-pop{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:40;text-align:center;pointer-events:none;
+  animation:bhPopIn .55s cubic-bezier(.2,1.5,.4,1) both, bhPopOut .4s ease-in 1.9s forwards;}
+.bh-pop.lv3{animation:bhPopIn .6s cubic-bezier(.2,1.5,.4,1) both, bhPopOut .45s ease-in 3.1s forwards;}
+.bh-pop::before{content:"";position:absolute;left:50%;top:50%;width:1100px;height:560px;transform:translate(-50%,-50%);z-index:-1;
+  background:radial-gradient(ellipse at center,rgba(29,42,56,.62) 0%,rgba(29,42,56,.4) 45%,rgba(29,42,56,0) 72%);}
+.bh-pop .big{font-size:110px;line-height:1.05;}
+.bh-pop .who{font-size:68px;font-weight:800;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.35);margin-top:2px;}
+.bh-pop .what{display:inline-block;margin-top:10px;background:var(--yellow);color:var(--ink);font-size:42px;font-weight:800;border-radius:99px;padding:6px 34px;box-shadow:0 5px 0 var(--yellow-shadow);}
+.bh-pop.lv2 .big{font-size:150px;} .bh-pop.lv2 .who{font-size:84px;} .bh-pop.lv2 .what{font-size:52px;background:var(--orange);}
+.bh-pop.lv3 .big{font-size:210px;} .bh-pop.lv3 .who{font-size:104px;} .bh-pop.lv3 .what{font-size:56px;background:var(--ink);color:var(--yellow);}
+.bh-pop .rings{position:absolute;left:50%;top:44%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;border:10px solid var(--yellow);opacity:0;z-index:-1;animation:bhRing 1.1s ease-out .1s both;}
+.bh-pop.lv2 .rings{border-color:var(--orange);animation-iteration-count:2;} .bh-pop.lv3 .rings{border-color:#fff;animation-iteration-count:3;}
+@keyframes bhPopIn{from{transform:translate(-50%,-50%) scale(.2) rotate(-8deg);opacity:0;}to{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1;}}
+@keyframes bhPopOut{to{transform:translate(-50%,-60%) scale(1.15);opacity:0;}}
+@keyframes bhRing{0%{transform:scale(.3);opacity:.9;}100%{transform:scale(4.2);opacity:0;}}
+.bh-flash{position:absolute;inset:0;background:#fff;z-index:36;pointer-events:none;animation:bhFlash .7s ease-out forwards;}
+@keyframes bhFlash{0%{opacity:.85;}100%{opacity:0;}}
+.bh-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:38;}
+.bh-confetti span{position:absolute;top:-60px;animation:bhFall 3s ease-in forwards;}
+@keyframes bhFall{to{transform:translateY(820px) rotate(420deg);opacity:.9;}}
+.bh-card.pulse{animation:bhCardPulse .7s ease-in-out 5;box-shadow:0 0 0 5px var(--yellow),0 0 30px 10px var(--yellow-glow);position:relative;z-index:3;}
+@keyframes bhCardPulse{50%{transform:scale(1.14);}}
+
+/* 好友冰狗：答對的格子邊框發光 */
+.bp-cell.glow,.bp-row.glow{position:relative;z-index:2;animation:bpGlow 1.7s ease-out 1;}
+@keyframes bpGlow{
+  0%{box-shadow:0 0 0 0 rgba(255,217,102,0);}
+  18%{box-shadow:0 0 0 4px #fff3b0,0 0 28px 12px rgba(255,217,102,.95);}
+  55%{box-shadow:0 0 0 3px #ffe066,0 0 18px 7px rgba(255,217,102,.7);}
+  100%{box-shadow:0 0 0 0 rgba(255,217,102,0);}
+}
+/* 「用點的」題目右下角的小手指 */
+.bp-tap{position:absolute;right:3px;bottom:1px;font-size:13px;line-height:1;pointer-events:none;}
+
+/* 第一次進來的教學：半透明遮罩 + 手指把 Aria 拖到「壽星是誰」 */
+.bp-tut{position:absolute;inset:0;z-index:50;background:rgba(43,58,74,.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:14px;overflow-y:auto;animation:tutIn .3s ease-out;}
+.bp-tut::before,.bp-tut::after{content:"";flex:1 0 0;}                      /* 空間夠就置中；螢幕比較矮時可以往下滑，不會被切掉 */
+@media (max-height:700px){.tut-stage{transform:scale(.82);margin:-20px 0;}}
+@keyframes tutIn{from{opacity:0;}to{opacity:1;}}
+.tut-stage{position:relative;flex:0 0 auto;width:280px;height:232px;}
+.tut-cell{position:absolute;left:86px;top:0;width:108px;height:132px;border-radius:10px;background:#fff;border:2px solid var(--blue-mid);
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;font-size:17px;font-weight:700;line-height:1.3;color:var(--ink);transition:background .2s,border-color .2s;}
+.tut-cell.hover{outline:3px dashed var(--orange);outline-offset:-2px;background:var(--yellow-light);}
+.tut-cell.filled{background:var(--yellow);border-color:var(--yellow-border);font-size:26px;font-weight:800;animation:bpGlow 1.7s ease-out 1;}
+.tut-chip{position:absolute;top:186px;width:80px;height:36px;border-radius:10px;border:2px solid var(--blue-mid);background:#fff;color:var(--ink);
+  font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
+.tut-chip.c1{left:6px;} .tut-chip.c2{left:100px;} .tut-chip.c3{left:194px;} .tut-chip.dim{opacity:.3;}
+.tut-ghost{position:absolute;left:6px;top:186px;width:80px;height:36px;border-radius:10px;background:var(--yellow);border:2px solid var(--yellow-border);color:var(--ink);
+  font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:0;z-index:3;box-shadow:0 8px 18px rgba(0,0,0,.35);
+  transition:transform 1.35s cubic-bezier(.45,0,.25,1),opacity .2s;}
+.tut-ghost.on{opacity:1;}
+.tut-ghost.drag{transform:translate(94px,-140px) scale(1.12);}
+.tut-finger{position:absolute;left:30px;top:196px;font-size:50px;line-height:1;opacity:0;z-index:4;filter:drop-shadow(0 6px 6px rgba(0,0,0,.4));
+  transition:transform 1.35s cubic-bezier(.45,0,.25,1),opacity .3s;}
+.tut-finger.on{opacity:1;}
+.tut-finger.press{transform:scale(.88);}
+.tut-finger.drag{transform:translate(94px,-140px) scale(.88);}
+.tut-msg{opacity:0;transition:opacity .6s ease;pointer-events:none;max-width:340px;color:#fff;text-align:center;}
+.tut-msg.show{opacity:1;pointer-events:auto;}
+.tut-msg .lines p{margin:0 0 3px;font-size:16px;line-height:1.7;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+.tut-msg .lines p.hl{margin-top:12px;font-size:20px;font-weight:800;color:var(--yellow);}
+.tut-msg .lines p.note{margin-top:6px;font-size:13.5px;font-weight:500;opacity:.88;}
+.tut-btns{display:flex;gap:10px;margin-top:12px;}
+.tut-btns .bp-btn{width:auto;flex:1;padding:11px 14px;font-size:15px;}
+
+/* 好友冰狗：答錯時畫面正中間的大提示 */
+.bp-wrong{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:45;pointer-events:none;text-align:center;max-width:84%;
+  background:rgba(224,85,79,.97);color:#fff;border-radius:24px;padding:20px 34px 18px;box-shadow:0 12px 34px rgba(0,0,0,.4);
+  animation:bpWrongIn .38s cubic-bezier(.2,1.6,.4,1) both, bpWrongOut .3s ease-in 1.2s forwards;}
+.bp-wrong .x{font-size:60px;line-height:1;font-weight:800;}
+.bp-wrong .t{font-size:26px;font-weight:800;margin-top:6px;}
+.bp-wrong .s{font-size:16px;margin-top:2px;opacity:.92;}
+@keyframes bpWrongIn{0%{transform:translate(-50%,-50%) scale(.4) rotate(-6deg);opacity:0;}60%{transform:translate(-50%,-50%) scale(1.1) rotate(2deg);opacity:1;}100%{transform:translate(-50%,-50%) scale(1);opacity:1;}}
+@keyframes bpWrongOut{to{opacity:0;transform:translate(-50%,-56%) scale(.94);}}
+.bp-cell.wrong,.bp-row.wrong{box-shadow:0 0 0 4px var(--danger);animation:bpShake .4s;}
+
+/* 教學說明裡的三個禮物盒：文字出現後，一個接一個跳出來，然後輕輕搖晃 */
+.tut-msg .gift{display:inline-block;font-size:26px;line-height:1;margin:0 1px;vertical-align:middle;opacity:0;transform:scale(0);}
+.tut-msg .gift.g1{--d:.55s;} .tut-msg .gift.g2{--d:.8s;} .tut-msg .gift.g3{--d:1.05s;}
+.tut-msg.show .gift{animation:giftPop .6s cubic-bezier(.2,1.7,.4,1) var(--d) both, giftWiggle 1.7s ease-in-out calc(var(--d) + .7s) infinite;}
+@keyframes giftPop{0%{opacity:0;transform:translateY(24px) scale(0) rotate(-30deg);}70%{opacity:1;transform:translateY(-8px) scale(1.35) rotate(8deg);}100%{opacity:1;transform:translateY(0) scale(1) rotate(0);}}
+@keyframes giftWiggle{0%,100%{transform:rotate(0) translateY(0);}25%{transform:rotate(-12deg) translateY(-3px);}75%{transform:rotate(12deg) translateY(-3px);}}
+
+.bh-rank-row .ex{flex:0 0 auto;margin-left:8px;font-size:18px;font-weight:800;color:var(--orange);}
+.bh-extra-note{margin-top:8px;font-size:13px;opacity:.7;line-height:1.4;}
+
+/* 教學：開頭「*」的句子，在禮物盒跳完之後一行一行跳出來（黃色螢光筆底線） */
+.tut-msg .lines p.pop{display:table;margin:6px auto 4px;padding:0 4px;font-size:18px;font-weight:800;opacity:0;transform:scale(.4);}
+.tut-msg.show .lines p.pop{background:linear-gradient(transparent 58%,rgba(255,217,102,.75) 58%) no-repeat 0 0/0% 100%;}
+.tut-msg.show .lines p.pop{animation:tutPop .65s cubic-bezier(.2,1.6,.4,1) var(--pd,1.9s) both, tutMark .5s ease-out calc(var(--pd,1.9s) + .45s) both;}
+@keyframes tutPop{0%{opacity:0;transform:translateY(16px) scale(.4) rotate(-4deg);}70%{opacity:1;transform:translateY(-4px) scale(1.12) rotate(1deg);}100%{opacity:1;transform:none;}}
+@keyframes tutMark{from{background-size:0% 100%;}to{background-size:100% 100%;}}
+
+/* 好友冰狗：上方列只留返回、教學、計分 */
+.bp-top .bp-spacer{flex:1;}
+/* 計分說明 */
+.bp-scoring{max-height:86vh;overflow-y:auto;text-align:left;}
+.bp-scoring h3{text-align:center;}
+.bp-sc-sec{margin:0 0 12px;}
+.bp-sc-sec .t{font-weight:800;font-size:15px;margin-bottom:4px;}
+.bp-sc-sec p{margin:0 0 6px;font-size:14px;line-height:1.6;}
+.bp-sc-sec p.s{font-size:13px;opacity:.7;}
+.bp-sc-table{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:6px 0;}
+.bp-sc-cell{background:var(--yellow-pale);border-radius:10px;padding:5px 2px;text-align:center;display:flex;flex-direction:column;gap:1px;}
+.bp-sc-cell .r{font-size:11px;opacity:.75;}
+.bp-sc-cell b{font-size:16px;}
+.bp-sc-cell.wide{grid-column:1 / -1;flex-direction:row;justify-content:center;align-items:baseline;gap:10px;background:var(--blue-pale);}
+.bp-sc-ex{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.bp-sc-pill{background:var(--ok-pale);color:var(--ink);border-radius:99px;padding:3px 10px;font-size:13px;font-weight:800;}
+.bp-sc-ex .dots{opacity:.6;font-weight:800;}
+
+/* ===== 第三輪：字色、邊框、中控台陰影 ===== */
+/* 手機：教學 / 計分連結深一點 */
+.bp-link{color:var(--link-ink);font-weight:700;font-size:13.5px;}
+.bp-scoring,.bp-scoring .bp-sc-sec p{color:var(--ink);}
+.bp-sc-sec p.s{opacity:.85;}
+.bp-sc-cell .r{opacity:.9;}
+.tut-msg .lines p.note{opacity:1;}
+/* 好友冰狗：格子、清單、名字的邊框深一點 */
+.bp-cell,.bp-row,.bp-chip{border-color:var(--cell-border);}
+.bp-cell.marked{border-color:var(--yellow-border);}
+.bp-cell.inline{border-color:var(--orange-border);}
+/* 中控台：白色底的區塊加陰影，跟背景分開 */
+.bh-stage .bh-clock,.bh-stage .bh-chip,.bh-stage .bh-btn:not(.primary),.bh-stage .bh-card:not(.empty),.bh-stage .bh-panel,
+.bh-stage .bh-bigcell,.bh-stage .bh-modal-in,.bh-stage .bh-pin form,
+.bh-stage .qh-qbox,.bh-stage .qh-media img,.bh-stage .qh-stepper,.bh-stage .qh-pchip,.bh-stage .qh-pod,.bh-stage .qh-buzz,.bh-stage .qh-judge,
+.bh-stage .qh-chipname,.bh-stage .qh-extra,.bh-stage .qh-secsel,
+.bh-stage .ch-mode,.bh-stage .ch-name,.bh-stage .ch-colR,.bh-stage .ch-stage,.bh-stage .ch-chip,.bh-stage .ch-pl,.bh-stage .ch-stepper,.bh-stage .ch-board,
+.bh-stage .aw-row:not(.head){box-shadow:var(--host-shadow);}
+.bh-stage .bh-card.done{box-shadow:0 0 0 3px var(--yellow-glow),0 3px 0 var(--yellow-shadow),var(--host-shadow);}
+.bh-stage .bh-card.pulse{box-shadow:0 0 0 5px var(--yellow),0 0 30px 10px var(--yellow-glow);}
+.bh-stage .aw-row.prize{box-shadow:inset 0 0 0 3px var(--yellow),var(--host-shadow);}
+
+/* 教學：「你是 + 題目」說明（停久一點） */
+.tut-cap{flex:0 0 auto;min-height:62px;text-align:center;color:#fff;opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .6s ease;}
+.tut-cap.show{opacity:1;transform:none;}
+.tut-cap .big{font-size:30px;font-weight:800;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.35);}
+.tut-cap .sm{font-size:15px;font-weight:600;opacity:.92;margin-top:2px;}
+
+/* 中控台的拖移（分桌、分組）：跟著游標的小標籤、目前會放進去的區域、插入位置的線 */
+.dnd-ghost{position:fixed;transform:translate(-50%,-50%) rotate(-3deg);pointer-events:none;z-index:99999;background:#fff;color:var(--ink);border:3px solid var(--blue-deep);border-radius:12px;padding:6px 14px;font-size:17px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.3);}
+.dnd-src{opacity:.35;}
+.dz-over{outline:3px dashed var(--orange);outline-offset:-3px;background:rgba(255,224,130,.35) !important;}
+.dz-before{box-shadow:0 -4px 0 0 var(--orange);}
+.qh-pchip,.ch-name{touch-action:none;-webkit-user-select:none;user-select:none;}

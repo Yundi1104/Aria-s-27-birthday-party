@@ -1,0 +1,145 @@
+/* 總排名／頒獎 — 中控台(aw-)。配色用 game.css 最上面的變數 */
+.hide-ctl .bh-controls{display:none !important;}
+.aw-main{position:absolute;left:20px;right:20px;top:80px;bottom:16px;display:flex;gap:18px;}
+
+/* ===== 偷看總排名（主持人用）===== */
+.aw-list{flex:0 0 840px;display:flex;flex-direction:column;gap:6px;min-width:0;}
+.aw-warn{background:var(--danger-pale);color:var(--danger);border-radius:12px;padding:6px 14px;font-size:18px;font-weight:800;}
+.aw-row{display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:0 16px;height:50px;font-size:26px;font-weight:700;box-shadow:0 2px 0 var(--blue-shadow);}
+.aw-row.head{background:transparent;box-shadow:none;height:28px;font-size:18px;opacity:.65;}
+.aw-row.prize{background:var(--yellow-pale);box-shadow:inset 0 0 0 3px var(--yellow);}
+.aw-row .rk{flex:0 0 auto;width:46px;height:38px;border-radius:12px;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;}
+.aw-row.head .rk{background:transparent;width:46px;}
+.aw-row .rk.r1{background:var(--yellow);} .aw-row .rk.r2{background:#e3e8ee;} .aw-row .rk.r3{background:var(--orange);}
+.aw-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.aw-row .nm small{font-size:14px;margin-left:10px;opacity:.6;font-weight:700;}
+.aw-row .n{flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;}
+.aw-row .t{flex:0 0 130px;text-align:right;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;}
+.aw-side{flex:1;min-width:0;align-self:flex-start;}
+.aw-side h2{margin:0 0 8px;}
+.aw-side p{margin:0 0 10px;font-size:18px;line-height:1.55;font-weight:600;}
+.aw-side p.gold{font-size:24px;font-weight:800;color:var(--gold-text);}
+.aw-side p.warn{color:var(--danger);font-weight:800;}
+.aw-side p.small{font-size:15px;opacity:.65;}
+.aw-src{margin-top:14px;padding-top:10px;border-top:1px dashed var(--blue-mid);font-size:16px;opacity:.75;line-height:1.7;}
+
+/* ===== 頒獎畫面 ===== */
+.aw-main.award{align-items:center;justify-content:center;}
+.aw-stagebox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;height:100%;}
+.aw-title{font-size:52px;font-weight:800;margin-top:6px;}
+.aw-title.done{background:linear-gradient(90deg,#f3b524,#fff3b0,#f3b524);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:awShimmer 2.4s linear infinite;}
+.aw-sub{font-size:24px;font-weight:700;opacity:.75;}
+.aw-podium{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:18px;width:100%;padding-bottom:4px;}
+.aw-slot{width:290px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;}
+.aw-card{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:0 6px 8px;gap:2px;}
+.aw-card .gift{font-size:118px;line-height:1;filter:drop-shadow(0 6px 4px rgba(43,58,74,.25));}
+.aw-slot.shaking .gift{animation:awGiftShake .14s infinite alternate;}
+.aw-card .medal{font-size:64px;line-height:1.05;}
+.aw-card .name{font-size:42px;font-weight:800;overflow-wrap:anywhere;line-height:1.12;}
+.aw-card .total{font-size:36px;font-weight:800;}
+.aw-card .brk{font-size:17px;font-weight:700;opacity:.7;}
+.aw-card .tag{font-size:16px;font-weight:800;color:var(--gold-text);background:var(--yellow-pale);border-radius:99px;padding:2px 12px;margin-top:2px;}
+.aw-step{border-radius:18px 18px 0 0;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;color:rgba(43,58,74,.45);box-shadow:0 4px 0 var(--blue-shadow);}
+.aw-slot.h1 .aw-step{height:210px;} .aw-slot.h2 .aw-step{height:150px;} .aw-slot.h3 .aw-step{height:105px;} .aw-slot.h4 .aw-step{height:80px;}
+.aw-slot.shown .aw-card{animation:awPop .7s cubic-bezier(.2,1.5,.4,1);}
+.aw-slot.shown .aw-step{color:var(--ink);animation:awRise .6s ease-out;}
+.aw-slot.shown.r1 .aw-step{background:linear-gradient(180deg,#ffe58a,var(--yellow));}
+.aw-slot.shown.r2 .aw-step{background:linear-gradient(180deg,#f4f7fa,#d7dee6);}
+.aw-slot.shown.r3 .aw-step{background:linear-gradient(180deg,#ffbf8a,var(--orange));}
+.aw-slot.shown.r1 .name{background:linear-gradient(90deg,#c98a00,#f3b524,#c98a00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+@keyframes awGiftShake{from{transform:rotate(-9deg) translateY(0);}to{transform:rotate(9deg) translateY(-5px);}}
+@keyframes awPop{0%{transform:scale(.3) translateY(80px);opacity:0;}70%{transform:scale(1.12);opacity:1;}100%{transform:none;}}
+@keyframes awRise{from{transform:scaleY(.3);transform-origin:bottom;}to{transform:none;transform-origin:bottom;}}
+@keyframes awShimmer{to{background-position:200% 0;}}
+
+/* ===== 揭曉動畫（疊在畫面上）===== */
+.aw-fx{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;}
+.aw-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:opacity .45s;}
+.aw-ov.out{opacity:0;}
+.aw-dim{position:absolute;inset:0;background:radial-gradient(circle at 50% 46%,rgba(20,28,40,.42),rgba(20,28,40,.9));animation:awFadeIn .5s ease-out;}
+.aw-beam{position:absolute;top:-80px;left:50%;width:420px;height:900px;margin-left:-210px;transform-origin:50% 0;opacity:.5;
+  background:linear-gradient(180deg,rgba(255,244,190,.85),rgba(255,244,190,0) 85%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);}
+.aw-beam.b1{animation:awSweepL 2.4s ease-in-out infinite alternate;} .aw-beam.b2{animation:awSweepR 2.9s ease-in-out infinite alternate;}
+.lv1 .aw-beam.b2{display:none;}
+@keyframes awSweepL{from{transform:rotate(-34deg);}to{transform:rotate(14deg);}}
+@keyframes awSweepR{from{transform:rotate(34deg);}to{transform:rotate(-14deg);}}
+@keyframes awFadeIn{from{opacity:0;}to{opacity:1;}}
+.aw-say{position:relative;z-index:2;font-size:56px;font-weight:800;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.4);min-height:70px;animation:awFadeIn .5s;}
+.aw-bigbox{position:relative;z-index:2;font-size:230px;line-height:1.05;filter:drop-shadow(0 12px 10px rgba(0,0,0,.45));animation:awBigShake .12s infinite alternate;}
+.lv1 .aw-bigbox{font-size:190px;} .lv3 .aw-bigbox{font-size:260px;animation:awBigShake .09s infinite alternate;}
+.aw-bigbox.burst{animation:awBurst .55s ease-out forwards;}
+@keyframes awBigShake{from{transform:rotate(-7deg) scale(1);}to{transform:rotate(7deg) scale(1.05);}}
+@keyframes awBurst{0%{transform:scale(1);opacity:1;}60%{transform:scale(2.4) rotate(14deg);opacity:.9;}100%{transform:scale(3.4);opacity:0;}}
+.aw-count{position:absolute;right:170px;top:210px;z-index:3;font-size:170px;font-weight:800;color:#ffe066;text-shadow:0 8px 0 rgba(0,0,0,.4);}
+.aw-count.pop{animation:awCount .45s ease-out;}
+@keyframes awCount{from{transform:scale(2.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.aw-roulette{position:relative;z-index:2;min-width:640px;max-width:900px;text-align:center;font-size:82px;font-weight:800;color:#ffe066;background:rgba(0,0,0,.42);border:6px solid #ffe066;border-radius:26px;padding:6px 34px;margin-top:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.aw-roulette.locked{background:#ffe066;color:var(--ink);animation:awLock .5s ease-out;}
+@keyframes awLock{0%{transform:scale(1.2);}100%{transform:scale(1);}}
+
+/* 宣布卡 */
+.aw-ann{position:relative;z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;animation:awAnn .7s cubic-bezier(.2,1.6,.4,1) both;}
+@keyframes awAnn{0%{transform:scale(.2) rotate(-10deg);opacity:0;}100%{transform:none;opacity:1;}}
+.aw-medal{font-size:120px;line-height:1;animation:awBounce 1s ease-in-out infinite;}
+.lv3 .aw-medal{font-size:150px;}
+@keyframes awBounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-16px) scale(1.08);}}
+.aw-ann-rank{font-size:50px;font-weight:800;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.4);}
+.lv3 .aw-ann-rank{font-size:64px;color:#ffe066;}
+.aw-ann-names{display:flex;gap:46px;align-items:flex-start;justify-content:center;}
+.aw-ann-one{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.aw-ann-name{font-size:104px;font-weight:800;line-height:1.1;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.4);max-width:760px;overflow-wrap:anywhere;}
+.aw-ann-names.multi .aw-ann-name{font-size:70px;max-width:480px;}
+.lv3 .aw-ann-name{font-size:132px;background:linear-gradient(90deg,#ffd24a,#fff,#ffd24a);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 6px 0 rgba(0,0,0,.45));animation:awShimmer 1.6s linear infinite;}
+.lv3 .aw-ann-names.multi .aw-ann-name{font-size:88px;}
+.aw-ann-score{font-size:60px;font-weight:800;color:#ffe066;text-shadow:0 4px 0 rgba(0,0,0,.4);}
+.aw-ann-brk{font-size:24px;font-weight:700;color:#fff;opacity:.85;}
+.aw-ann-note{margin-top:6px;font-size:24px;font-weight:800;color:#fff;background:rgba(255,255,255,.2);border-radius:99px;padding:4px 22px;}
+.aw-crown{position:absolute;top:-76px;left:50%;margin-left:-60px;font-size:120px;animation:awCrown 1s cubic-bezier(.3,1.7,.5,1) .35s both;z-index:3;}
+@keyframes awCrown{0%{transform:translateY(-300px) rotate(-30deg);opacity:0;}100%{transform:translateY(0) rotate(0);opacity:1;}}
+.aw-trophy{position:absolute;right:-150px;bottom:20px;font-size:130px;animation:awBounce .9s ease-in-out infinite;}
+.aw-rays{position:absolute;left:50%;top:50%;width:1500px;height:1500px;margin:-750px 0 0 -750px;z-index:-1;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,224,102,.55) 0 7deg,rgba(255,224,102,0) 7deg 18deg);
+  -webkit-mask-image:radial-gradient(circle,#000 8%,transparent 66%);mask-image:radial-gradient(circle,#000 8%,transparent 66%);animation:awSpin 12s linear infinite;}
+@keyframes awSpin{to{transform:rotate(360deg);}}
+
+/* 閃光、光圈、煙火、彩帶 */
+.aw-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:awFlash .7s ease-out;z-index:5;}
+.aw-flash.strong{animation-duration:1s;}
+@keyframes awFlash{0%{opacity:.9;}100%{opacity:0;}}
+.aw-ring{position:absolute;left:50%;top:48%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;border:12px solid #ffd24a;opacity:0;animation:awRing 1.2s ease-out forwards;z-index:3;}
+.aw-ring.gold{border-color:#fff;border-width:16px;}
+@keyframes awRing{0%{transform:scale(.3);opacity:.95;}100%{transform:scale(6);opacity:0;}}
+.aw-firework{position:absolute;width:0;height:0;z-index:6;}
+.aw-spark{position:absolute;left:0;top:0;width:10px;height:10px;border-radius:50%;animation:awSpark 1.2s ease-out forwards;box-shadow:0 0 8px currentColor;}
+@keyframes awSpark{0%{transform:translate(0,0) scale(1);opacity:1;}80%{opacity:1;}100%{transform:translate(var(--dx),calc(var(--dy) + 50px)) scale(.2);opacity:0;}}
+.aw-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:7;}
+.aw-confetti span{position:absolute;top:-50px;animation:awFall 3.6s ease-in forwards;}
+@keyframes awFall{to{transform:translateY(840px) rotate(420deg);opacity:.85;}}
+.aw-cannon{position:absolute;inset:0;overflow:hidden;z-index:7;}
+.aw-cannon span{position:absolute;bottom:-30px;animation:awCannon 2.2s cubic-bezier(.2,.7,.4,1) forwards;}
+@keyframes awCannon{0%{transform:translate(0,0) rotate(0);opacity:1;}70%{opacity:1;}100%{transform:translate(var(--dx),calc(var(--dy) + 700px)) rotate(540deg);opacity:0;}}
+.aw-quake .aw-main{animation:awQuake .6s ease-in-out;}
+@keyframes awQuake{0%,100%{transform:translate(0,0);}10%{transform:translate(-14px,8px);}25%{transform:translate(12px,-10px);}40%{transform:translate(-10px,-8px);}55%{transform:translate(9px,10px);}70%{transform:translate(-6px,4px);}85%{transform:translate(4px,-3px);}}
+
+/* 領獎台：卡片（名字、分數）不會被擠壓；空間不夠時改縮台階，不會把分數蓋掉 */
+.aw-podium{min-height:0;}
+.aw-slot{max-height:100%;min-height:0;}
+.aw-card{flex:0 0 auto;}
+.aw-step{flex:0 1 auto;min-height:64px;}
+.aw-slot.shown.h1 .aw-step{height:150px;} .aw-slot.shown.h2 .aw-step{height:110px;} .aw-slot.shown.h3 .aw-step{height:80px;}
+.aw-slot.shown .aw-card .name{font-size:38px;}
+/* 宣布卡縮小一點：第 2、1 名的分數和明細不會被畫面底部切掉 */
+.aw-ov{padding:70px 0 24px;box-sizing:border-box;}
+.aw-ann{gap:2px;max-height:100%;}
+.aw-medal{font-size:92px;}
+.lv3 .aw-medal{font-size:104px;}
+.aw-crown{font-size:96px;top:-64px;margin-left:-48px;}
+.aw-ann-rank{font-size:44px;}
+.lv3 .aw-ann-rank{font-size:52px;}
+.aw-ann-name{font-size:92px;line-height:1.05;}
+.lv3 .aw-ann-name{font-size:112px;}
+.aw-ann-names.multi .aw-ann-name,.lv3 .aw-ann-names.multi .aw-ann-name{font-size:68px;}
+.aw-ann-score{font-size:52px;line-height:1.15;}
+.aw-ann-brk{font-size:22px;}
+.aw-trophy{font-size:110px;bottom:0;}
+.aw-bigbox.burst{position:absolute;}   /* 爆開後不佔位置，宣布卡才會在畫面正中間 */
