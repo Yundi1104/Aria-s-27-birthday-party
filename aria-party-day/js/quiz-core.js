@@ -210,10 +210,17 @@
 
   // ---------- 影片網址 → 內嵌播放器 ----------
   // 回傳 { kind: 'iframe'|'video', src, open(原始網址) }
+  // 網址裡的開始時間：?t=94、&t=94s、?t=1m34s、&start=94 都可以 → 從第幾秒開始播
+  function ytStart(url) {
+    var m = /[?&#](?:t|start)=([0-9hms]+)/.exec(url); if (!m) return 0;
+    var v = m[1]; if (/^\d+$/.test(v)) return parseInt(v, 10);
+    var h = /(\d+)h/.exec(v), mi = /(\d+)m/.exec(v), se = /(\d+)s/.exec(v);
+    return (h ? parseInt(h[1], 10) * 3600 : 0) + (mi ? parseInt(mi[1], 10) * 60 : 0) + (se ? parseInt(se[1], 10) : 0);
+  }
   function videoEmbed(url) {
     if (!url) return null;
     var m = /(?:youtube\.com\/watch\?[^#]*v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{6,})/.exec(url);
-    if (m) return { kind: "iframe", src: "https://www.youtube.com/embed/" + m[1] + "?rel=0&playsinline=1", open: url };
+    if (m) return { kind: "iframe", src: "https://www.youtube.com/embed/" + m[1] + "?rel=0&playsinline=1" + (ytStart(url) ? "&start=" + ytStart(url) : ""), open: url };
     m = /bilibili\.com\/video\/(BV[A-Za-z0-9]+)/.exec(url);
     if (m) return { kind: "iframe", src: "https://player.bilibili.com/player.html?bvid=" + m[1] + "&autoplay=0&high_quality=1&danmaku=0", open: url };
     if (/^https?:/.test(url) && !/\.(mp4|webm|mov|m4v)(\?|$)/i.test(url)) return { kind: "iframe", src: url, open: url };

@@ -205,3 +205,15 @@
 .qp-buzz:active:not(:disabled){transform:translateY(6px);box-shadow:0 4px 0 #8e1515,0 6px 12px rgba(0,0,0,.25);}
 .qp-buzz.locked{background:radial-gradient(circle at 35% 30%,#e3e8ee,#9aa5b1 65%,#6b7682);box-shadow:0 10px 0 #4d5661;font-size:64px;cursor:not-allowed;}
 .qp-buzz.done{background:radial-gradient(circle at 35% 30%,#a5e3b4,#34a853 60%,#1e7a38);box-shadow:0 4px 0 #155a29;transform:translateY(6px);font-size:36px;}
+
+/* 加分視窗：給主持人對照的標準答案（預設藏起來） */
+.qh-ref{white-space:pre-wrap;text-align:left;font-size:15px;line-height:1.6;background:#fff;border:2px dashed var(--blue-mid);border-radius:12px;padding:10px 14px;margin:8px 0;max-height:240px;overflow:auto;}
+
+/* 分組畫面（拖移版）：上面「不玩」、下面每一組一個框 */
+.qh-zones{display:grid;gap:10px;align-content:start;}
+.qh-zone{background:rgba(255,255,255,.7);border-radius:14px;padding:8px;min-height:84px;}
+.qh-zone .qh-sumtag{display:inline-block;margin-bottom:6px;}
+.qh-zone .qh-roster.zone{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;}
+.qh-pool{grid-column:1 / -1;background:rgba(255,255,255,.55);}
+.qh-zone .qh-pchip{cursor:grab;}
+.qh-zone .qh-pchip{height:40px;font-size:17px;padding:0 10px;gap:6px;}

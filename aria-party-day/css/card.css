@@ -74,9 +74,11 @@
 .ch-setbox{flex:1;min-width:0;overflow:hidden;}
 .ch-setbox h2{margin:0 0 8px;}
 .ch-names{display:grid;grid-template-columns:1fr;gap:6px;}
-.ch-names.two{grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(10,auto);gap:6px 14px;}
+.ch-names.two{grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(11,auto);gap:6px 14px;}
 .ch-name{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:5px 14px;font-size:21px;font-weight:700;}
 .ch-name.click{cursor:pointer;}
+.ch-names.two{gap:4px 12px;}
+.ch-names.two .ch-name{padding:3px 12px;font-size:19px;}            /* 21 個名字排成 2 欄 × 11 列，要塞得進一個畫面 */
 .ch-name.click:hover{background:var(--yellow-pale);}
 .ch-name .no{opacity:.4;min-width:26px;font-size:17px;}
 .ch-name .dot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#c8d3dd;}

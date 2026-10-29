@@ -302,7 +302,7 @@
       if (lobby) {
         inner.appendChild(el("div", { "class": "bp-note" }, ["✅ 已簽到！等主持人宣布開始…"]));
       } else if (my && my.rank) {
-        inner.appendChild(el("div", { "class": "bp-banner", text: "🎉 你是第 " + my.rank + " 個連成 " + need + " 條！ +" + my.points + " 分" + (my.extra ? "　額外賽 +" + my.extra + " 分（" + b.count + " 條）" : "") }));
+        inner.appendChild(el("div", { "class": "bp-banner", text: "🎉 你連成 " + need + " 條了！ +" + my.points + " 分" + (my.extra ? "　額外賽 +" + my.extra + " 分（" + b.count + " 條）" : "") }));
       } else if (status === "ended") {
         inner.appendChild(el("div", { "class": "bp-note", text: "遊戲結束，謝謝你的參與 💓" }));
       }

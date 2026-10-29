@@ -148,14 +148,7 @@
         ]));
       });
       out.push(el("div", { "class": "cp-h", text: "輪流順序（" + d.order.length + " 人）" })); out.push(roster);
-      if (sb && d.finished) {                                         // 這桌結束：分數榜
-        var board = el("div", { "class": "cp-board" }, [el("div", { "class": "cp-h", text: "🏆 分數榜" })]);
-        sb.rows.filter(function (r) { return r.table === ctx.t; }).slice(0, 5).forEach(function (r) {
-          board.appendChild(el("div", { "class": "cp-brow" + (r.pid === me ? " me" : "") }, [el("span", { "class": "rk", text: String(r.rank) }), el("span", { "class": "nm", text: r.name }), el("span", { "class": "pt", text: r.points + " 分" })]));
-        });
-        out.push(board);
-      }
-
+      // （這桌結束時，手機不顯示分數榜 / 名次，留到頒獎才揭曉；自己的分數看上面的「你的分數」）
       return out;
     }
 

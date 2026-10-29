@@ -73,7 +73,7 @@
     // 派對解鎖（PARTY.UNLOCK_AT）之前：菜單和三個遊戲顯示「???」圖 + 小字「派對解鎖」，點了沒反應
     function lockedEntry(it) {
       var txt = P.LOCKED_TEXT || "派對解鎖", a;
-      if (it.img) a = el("div", { "class": "pg-entry pg-imgbtn locked", "aria-disabled": "true", role: "img", "aria-label": "???　" + txt }, [el("img", { src: it.lockedImg || it.img, alt: "???" }), el("span", { "class": "pg-locktxt", text: txt })]);
+      if (it.img) a = el("div", { "class": "pg-entry pg-imgbtn locked", "aria-disabled": "true", role: "img", "aria-label": "???　" + txt }, [el("img", { src: it.lockedImg || it.img, alt: "???　" + txt })]);       // 圖片裡已經有「派對解鎖」四個字
       else a = el("div", { "class": "pg-entry pg-tile locked", "aria-disabled": "true" }, [el("span", { "class": "ic", text: "❓" }), el("span", { "class": "tx" }, [el("b", { text: "???" }), el("small", { text: txt })])]);
       a.setAttribute("data-page", it.page); a.setAttribute("data-title", "???");
       return a;

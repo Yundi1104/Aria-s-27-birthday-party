@@ -23,7 +23,7 @@
 *{box-sizing:border-box;}
 /* 連點 / 狂按不會觸發「點兩下放大」（雙指縮放照常可以）；搶答鈕還另外鎖了文字選取和長按選單 */
 html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-html{background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
+html{background:var(--blue-light) url(../images/background-tile.jpg) center top/100% auto repeat-y;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
 html,body{margin:0;padding:0;height:100%;color:var(--ink);background:var(--blue-light);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
   -webkit-tap-highlight-color:transparent;}
@@ -182,6 +182,10 @@ button{font-family:inherit;}
 .bh-spacer{flex:1;}
 .bh-controls{display:flex;gap:8px;align-items:center;}
 .bh-controls.hidden{display:none;}
+/* 「‹ 中控台」回主持人入口的按鈕（四個中控台都有；輸入密碼的畫面左上角也有） */
+a.bh-btn{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;}
+.bh-back{background:rgba(255,255,255,.72);color:var(--blue-deep);}
+.bh-pin .bh-back{position:absolute;left:18px;top:18px;background:#fff;}
 .bh-btn{border:none;border-radius:99px;padding:8px 16px;font-size:16px;font-weight:700;cursor:pointer;background:#fff;color:var(--ink);}
 .bh-btn.primary{background:var(--ink);color:#fff;}
 .bh-btn.danger.armed{background:var(--danger);color:#fff;}
@@ -385,3 +389,10 @@ button{font-family:inherit;}
 .tut-cap.show{opacity:1;transform:none;}
 .tut-cap .big{font-size:30px;font-weight:800;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.35);}
 .tut-cap .sm{font-size:15px;font-weight:600;opacity:.92;margin-top:2px;}
+
+/* 中控台的拖移（分桌、分組）：跟著游標的小標籤、目前會放進去的區域、插入位置的線 */
+.dnd-ghost{position:fixed;transform:translate(-50%,-50%) rotate(-3deg);pointer-events:none;z-index:99999;background:#fff;color:var(--ink);border:3px solid var(--blue-deep);border-radius:12px;padding:6px 14px;font-size:17px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.3);}
+.dnd-src{opacity:.35;}
+.dz-over{outline:3px dashed var(--orange);outline-offset:-3px;background:rgba(255,224,130,.35) !important;}
+.dz-before{box-shadow:0 -4px 0 0 var(--orange);}
+.qh-pchip,.ch-name{touch-action:none;-webkit-user-select:none;user-select:none;}

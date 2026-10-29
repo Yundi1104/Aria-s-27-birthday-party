@@ -1,8 +1,8 @@
 /* 入口頁、時程表、場地・轉帳資訊（pg-）。配色用 game.css 最上面的變數 */
 html,body{height:auto;min-height:100%;}
 /* 背景圖固定在畫面上（頁面很長時往下滑也不會露出底下的純藍色） */
-.pg-wrap{position:relative;min-height:100%;background:var(--blue-light);}
-.pg-wrap::before{content:"";position:fixed;left:0;right:0;top:-120px;bottom:-120px;z-index:0;pointer-events:none;background:var(--blue-light) url(../images/background.png) center top/cover no-repeat;}
+/* 背景跟著頁面一路往下延伸：一張圖（上面原圖、下面鏡射）重複鋪，接縫看不出來；頁面多長，背景就多長 */
+.pg-wrap{position:relative;min-height:100%;background:var(--blue-light) url(../images/background-tile.jpg) center top/100% auto repeat-y;}
 .pg-inner{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:14px 14px 44px;}
 
 .pg-bar{display:flex;align-items:center;gap:10px;}
@@ -93,7 +93,8 @@ html,body{height:auto;min-height:100%;}
 .mn-filter .chips{display:flex;flex-wrap:wrap;gap:6px;}
 .mn-chip{border:2px solid var(--mn-blue);background:transparent;border-radius:99px;padding:3px 11px;font-size:13px;font-weight:800;color:var(--mn-blue);cursor:pointer;font-family:inherit;}
 .mn-chip.on{background:var(--mn-bad);border-color:var(--mn-bad);color:#fff;}
-.mn-sec{margin:0 0 18px;}
+.mn-sec{margin:0 0 40px;}                         /* 每個大類別之間留一段空 */
+.mn-sec:last-of-type{margin-bottom:22px;}
 .mn-sh{margin:0 0 10px;font-size:30px;line-height:1.15;font-weight:900;color:var(--mn-blue);display:flex;align-items:baseline;gap:10px;}
 .mn-sh small{font-size:11px;font-weight:800;letter-spacing:2.5px;opacity:.65;}
 .mn-list{display:flex;flex-direction:column;gap:12px;}
@@ -153,4 +154,20 @@ html,body{height:auto;min-height:100%;}
 .pg-srow .no{font-size:13px;font-weight:600;opacity:.75;margin-top:2px;}
 /* 入口頁：派對解鎖之前的「???」按鈕（不能點） */
 .pg-entry.locked{cursor:default;pointer-events:none;-webkit-tap-highlight-color:transparent;}
-.pg-locktxt{display:block;text-align:center;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--blue-deep);margin-top:-4px;}
+
+/* 主持人入口：密碼畫面、一鍵重置 */
+.hi-gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--blue-light);}
+.hi-gate-card{width:100%;max-width:320px;background:#fff;border-radius:22px;padding:26px 22px 20px;text-align:center;box-shadow:0 10px 30px rgba(43,58,74,.2);}
+.hi-gate-card .em{font-size:44px;}
+.hi-gate-card h2{margin:4px 0 14px;font-size:22px;color:var(--ink);}
+.hi-gate-card input{width:100%;box-sizing:border-box;font-size:20px;padding:10px 12px;border:2px solid var(--blue-mid);border-radius:10px;text-align:center;margin-bottom:8px;}
+.hi-gate-card .err{min-height:20px;color:var(--danger);font-size:14px;font-weight:700;margin-bottom:6px;}
+.hi-gate-card .hi-btn{width:100%;}
+.hi-back{display:inline-block;margin-top:12px;font-size:13px;color:var(--blue-deep);text-decoration:none;}
+.hi-btn{display:inline-block;border:none;border-radius:99px;padding:12px 22px;font-size:17px;font-weight:800;cursor:pointer;background:var(--yellow);color:var(--ink);box-shadow:0 3px 0 var(--yellow-shadow);font-family:inherit;}
+.hi-btn.danger{background:#fff;border:2px solid var(--danger);color:var(--danger);box-shadow:none;}
+.hi-btn.danger.armed{background:var(--danger);color:#fff;}
+.hi-reset{background:#fff;border:2px solid var(--blue-mid);border-radius:14px;padding:12px 14px;margin-bottom:8px;}
+.hi-reset p{margin:0 0 10px;font-size:14px;line-height:1.6;}
+.hi-msg{margin-top:10px;font-size:14px;font-weight:700;line-height:1.6;}
+.hi-msg.good{color:var(--ok);} .hi-msg.bad{color:var(--danger);}

@@ -34,7 +34,7 @@
     opts = opts || {};
     var BC = B.CONFIG, QC = Q.CONFIG;
     var state = { status: "lobby", index: -1, revealed: -1, starts: {}, durs: {}, revealAt: {}, players: {}, answers: {}, buzz: {}, judge: {}, extra: {}, teams: { count: 0, assign: {} } };
-    var connected = true, armed = false, armTimer = null, autoFor = -1, leftKey = null, refs = {}, showSetup = false, showExtra = false;
+    var connected = true, armed = false, armTimer = null, autoFor = -1, leftKey = null, refs = {}, showSetup = false, showExtra = false, showRef = false;
     var secTarget = null, secValue = null;          // 下一題要用的秒數（出題前主持人選；沒選 = 那題的預設秒數）
 
     host.innerHTML = "";
@@ -64,6 +64,8 @@
     var btnReset = el("button", { "class": "bh-btn danger", type: "button", text: "重置", onclick: onReset });
     var btnTeams = el("button", { "class": "bh-btn", type: "button", text: "調整分組", onclick: function () { showSetup = !showSetup; update(); } });
     var controls = el("div", { "class": "bh-controls" }, [secSel, btnMain, btnAdd, btnReveal, btnExtra, btnTeams, btnEnd, btnReset]);
+    // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來；按 H 把按鈕藏起來時它也會藏起來
+    if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
         el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
@@ -86,7 +88,7 @@
       else store.startQuestion(i, pickSeconds(i));
     }
     function onMain() {
-      showExtra = false;
+      showExtra = false; showRef = false;
       if (state.status === "lobby") { if (K.assignedPids(state).length && K.firstIndex() >= 0) { showSetup = false; go(K.firstIndex()); } }
       else if (state.status === "intro") store.startQuestion(state.index, pickSeconds(state.index));
       else if (state.status === "reveal") go(K.nextIndex(state.index));
@@ -225,10 +227,14 @@
         if (got) c.style.background = "var(--ok)";
         grid.appendChild(c);
       });
+      // 給主持人對照的標準答案（例如背誦的台詞）：平常藏起來，按「看加分答案」才顯示
+      var refBox = q.bonus.ref ? el("div", { "class": "qh-ref", text: q.bonus.ref }) : null;
+      var refBtn = q.bonus.ref ? el("button", { "class": "bh-btn", type: "button", text: showRef ? "🙈 藏起加分答案" : "👀 看加分答案", onclick: function () { showRef = !showRef; renderExtra(); } }) : null;
+      if (refBox && !showRef) refBox.style.display = "none";
       overlay.appendChild(el("div", { "class": "qh-extra" }, [
         el("h2", { text: "🎁 " + q.bonus.label + "　+" + q.bonus.points + " 分" }),
-        el("div", { "class": "qh-hint", text: "點名字加分 / 取消（加在個人分數，不算進組別分數）" }), grid,
-        el("button", { "class": "bh-btn primary", type: "button", text: "完成", onclick: function () { showExtra = false; update(); } })
+        el("div", { "class": "qh-hint", text: "點名字加分 / 取消（加在個人分數，不算進組別分數）" }), refBtn, refBox, grid,
+        el("button", { "class": "bh-btn primary", type: "button", text: "完成", onclick: function () { showExtra = false; showRef = false; update(); } })
       ]));
     }
 
@@ -254,6 +260,14 @@
       commitTeams(cnt, a);
     }
 
+    // 拖移分組（只在分組畫面有 .qh-pchip 可以拖）
+    function dropTeam(pid, zoneId) {
+      var cnt = effCount(), a = currentAssign();
+      if (zoneId === "pool") delete a[pid]; else { var k = parseInt(String(zoneId).slice(1), 10); if (k >= 0 && k < cnt) a[pid] = k; }
+      commitTeams(cnt, a);
+    }
+    PartyDnd.enable(left, { itemSel: ".qh-pchip", zoneSel: "[data-zone]", keyOf: function (e) { return e.getAttribute("data-pid"); }, onDrop: dropTeam });
+
     function buildSetup() {
       left.innerHTML = ""; refs = {};
       var cnt = effCount(), a = currentAssign(), joined = state.players, MAX = QC.MAX_TEAMS || 8, t;
@@ -271,25 +285,30 @@
         el("button", { "class": "bh-btn", type: "button", text: scoreMode() === "average" ? "計分：平均每人 ⇄" : "計分：全組加總 ⇄",
           title: "各組人數不一樣、或有人不玩時，用「平均每人」比較公平", onclick: function () { commitTeams(cnt, currentAssign(), scoreMode() === "average" ? "sum" : "average"); } })
       ]);
-      var grid = el("div", { "class": "qh-roster" });
+      // 拖移版面：上面是「還沒分組（不玩）」的名字，下面每一組一個框；把名字拖進框裡就分好組，拖回上面 = 這局不玩。點名字也可以換組。
+      var zones = el("div", { "class": "qh-zones" }), bodies = {}, tag;
+      function zone(key, label, bg, out) {
+        var n = key === "pool" ? B.GUESTS.length - Object.keys(a).length : Object.keys(a).filter(function (pid) { return a[pid] === parseInt(key.slice(1), 10); }).length;
+        tag = el("span", { "class": "qh-sumtag" + (out ? " out" : ""), text: label + "　" + n + " 人" }); if (bg) tag.style.background = bg;
+        var body = el("div", { "class": "qh-roster zone" }); bodies[key] = body;
+        var box = el("div", { "class": "qh-zone" + (out ? " qh-pool" : ""), "data-zone": key }, [tag, body]);
+        zones.appendChild(box);
+      }
+      zone("pool", "不玩", null, true);
+      for (t = 0; t < cnt; t++) zone("t" + t, K.teamLabel(t), K.teamColor(t), false);
+      zones.style.gridTemplateColumns = "repeat(" + Math.max(1, Math.min(cnt, 4)) + ",minmax(0,1fr))";
       B.GUESTS.map(function (g, i) { return { g: g, pid: C.guestId(i) }; }).forEach(function (x) {
         var tm = a[x.pid] == null ? -1 : a[x.pid];
-        var chip = el("button", { "class": "qh-pchip" + (tm >= 0 ? " in" : ""), type: "button", onclick: function () { cycle(x.pid); } }, [
+        var chip = el("button", { "class": "qh-pchip" + (tm >= 0 ? " in" : ""), type: "button", "data-pid": x.pid, onclick: function () { cycle(x.pid); } }, [
           el("span", { "class": "dot" + (joined[x.pid] ? " on" : ""), title: joined[x.pid] ? "已進場" : "還沒進場" }),
           el("span", { "class": "nm", text: x.g }),
           el("span", { "class": "tg", text: tm >= 0 ? K.teamIcon(tm) + (tm + 1) : "不玩" })
         ]);
         if (tm >= 0) chip.style.background = K.teamColor(tm);
-        grid.appendChild(chip);
+        bodies[tm >= 0 ? "t" + tm : "pool"].appendChild(chip);
       });
-      var sum = el("div", { "class": "qh-sum" });
-      for (t = 0; t < cnt; t++) {
-        var n = Object.keys(a).filter(function (pid) { return a[pid] === t; }).length, tag = el("span", { "class": "qh-sumtag", text: K.teamLabel(t) + "　" + n + " 人" });
-        tag.style.background = K.teamColor(t); sum.appendChild(tag);
-      }
-      sum.appendChild(el("span", { "class": "qh-sumtag out", text: "不玩　" + (B.GUESTS.length - Object.keys(a).length) + " 人" }));
       left.appendChild(el("div", { "class": "qh-setup" }, [
-        top, el("div", { "class": "qh-hint", text: "點名字換組別：不玩 → 第 1 組 → 第 2 組 … → 不玩。綠點 = 已進場。沒被分組的人這局用看的，也不會算分。" }), grid, sum
+        top, el("div", { "class": "qh-hint", text: "把名字拖進組別的框框（拖回最上面 = 這局不玩），或點名字換組別。綠點 = 已進場。沒被分組的人這局用看的，也不會算分。" }), zones
       ]));
     }
 
@@ -423,15 +442,16 @@
       store.subscribe(function (s) { state = s; update(); });
       if (store.onConnection) store.onConnection(function (ok) { connected = ok; update(); });
     }
-    var needPin = opts.pin && !(function () { try { return sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
+    var needPin = opts.pin && !(function () { try { return (root.HostAuth && root.HostAuth.ok()) || sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
     if (needPin) {
       var input = el("input", { type: "password", placeholder: "中控台密碼", autocomplete: "off" });
       var err = el("div", { "class": "err" });
       var gate = el("div", { "class": "bh-pin" });
+      if (opts && opts.backHref) gate.appendChild(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 回主持人入口" }));
       var form = el("form", {}, [el("h2", { text: "🔒 問答中控台" }), input, err, el("button", { "class": "bh-btn primary", type: "submit", text: "進入" })]);
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (input.value === opts.pin) { try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
+        if (input.value === opts.pin) { if (root.HostAuth) root.HostAuth.set(); try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
         else { err.textContent = "密碼不對"; input.value = ""; }
       });
       gate.appendChild(form); stage.appendChild(gate);

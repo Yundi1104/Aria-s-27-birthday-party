@@ -8,15 +8,33 @@
 <link rel="stylesheet" href="css/party.css">
 </head>
 <body>
-<div class="hi-wrap">
+<!-- 密碼畫面：在這裡輸入一次密碼，四個中控台就都不會再問了（密碼在 js/bingo-data.js 的 HOST_PIN） -->
+<div class="hi-gate" id="hiGate">
+  <form class="hi-gate-card" id="hiForm">
+    <div class="em">🎛️</div>
+    <h2>主持人入口</h2>
+    <input id="hiPin" type="password" inputmode="text" autocomplete="off" placeholder="輸入密碼">
+    <div class="err" id="hiErr"></div>
+    <button class="hi-btn" type="submit">進入</button>
+    <a class="hi-back" href="index.html">‹ 回賓客入口</a>
+  </form>
+</div>
+<div class="hi-wrap" id="hiContent" style="display:none">
   <h1>🎛️ 主持人入口</h1>
-  <p class="s">派對當天的各個中控台（接電腦投影）。每個中控台第一次打開都要輸入密碼，密碼在 <b>js/bingo-data.js</b> 的 <b>HOST_PIN</b>。<br>賓客用的入口頁是 <b>index.html</b>。</p>
+  <p class="s">派對當天的各個中控台（接電腦投影）。<b>密碼只要在這裡輸入一次</b>，四個中控台就不會再問了（這台電腦 12 小時內有效）。賓客用的入口頁是 <b>index.html</b>。</p>
 
   <div class="hi-sec">照時程表的順序</div>
   <a class="hi-link" href="host.html"><span class="t">🎯 好友冰狗<small>18:00 ~ 19:00　開始遊戲 / 看每個人的盤面</small></span><span class="tm">18:00</span></a>
   <a class="hi-link" href="quiz-host.html"><span class="t">🧠 迷因海公牛<small>19:00　按「開始測驗」，倒數、揭曉、排名</small></span><span class="tm">19:00</span></a>
 <a class="hi-link" href="card-host.html"><span class="t">🃏 陪酒小姐<small>19:20　點名字指定誰來玩（人數、名單、桌數都由妳決定），抽到數字幾 +幾分</small></span><span class="tm">19:20</span></a>
 <a class="hi-link" href="award-host.html"><span class="t">🏆 總排名・頒獎<small>19:35　三個遊戲加總，一進去就是頒獎畫面，逐一揭曉前三名</small></span><span class="tm">19:35</span></a>
+
+  <div class="hi-sec">🧹 派對前清空</div>
+  <div class="hi-reset">
+    <p>一鍵把<b>好友冰狗、迷因海公牛、陪酒小姐</b>三個遊戲全部清空：玩家簽到、分數、分組、桌次、自由開局的房間，都回到一開始。彩排完、正式開始前按一次。（按兩次才會執行，不會誤按。）</p>
+    <button class="hi-btn danger" id="resetAll" type="button">🧹 重置全部</button>
+    <div class="hi-msg" id="resetMsg"></div>
+  </div>
 
   <div class="hi-sec">賓客入口（QR code 做這個網址）</div>
   <a class="hi-link" href="index.html"><span class="t">🎉 入口頁<small>遊戲、時程表、活動資訊、菜單、三個遊戲</small></span></a>
@@ -28,5 +46,49 @@
   <a class="hi-link" href="award-demo.html"><span class="t">總排名・頒獎預覽</span></a>
   <a class="hi-link" href="party-demo.html"><span class="t">入口頁 + 時程表 + 場地資訊預覽</span></a>
 </div>
+<script src="js/firebase-config.js"></script>
+<script src="js/bingo-data.js"></script>
+<script src="js/bingo-core.js"></script>
+<script src="js/store.js"></script>
+<script src="js/quiz-data.js"></script>
+<script src="js/quiz-core.js"></script>
+<script src="js/quiz-store.js"></script>
+<script src="js/card-data.js"></script>
+<script src="js/card-core.js"></script>
+<script src="js/card-store.js"></script>
+<script src="js/host-auth.js"></script>
+<script>
+  (function () {
+    var gate = document.getElementById("hiGate"), content = document.getElementById("hiContent");
+    function open() { gate.style.display = "none"; content.style.display = ""; }
+    if (HostAuth.ok()) open();
+    document.getElementById("hiForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (document.getElementById("hiPin").value === BINGO_DATA.CONFIG.HOST_PIN) { HostAuth.set(); open(); }
+      else document.getElementById("hiErr").textContent = "密碼不對";
+    });
+
+    // ---- 一鍵重置全部（按兩次才會做）----
+    var btn = document.getElementById("resetAll"), msg = document.getElementById("resetMsg"), armed = false, timer = null;
+    function disarm() { armed = false; clearTimeout(timer); btn.textContent = "🧹 重置全部"; btn.classList.remove("armed"); }
+    function run(name, fn) {
+      return new Promise(function (resolve) { try { resolve(fn()); } catch (e) { throw e; } }).then(function () { return { name: name, ok: true }; }, function (e) { return { name: name, ok: false, err: String(e && e.message || e) }; });
+    }
+    btn.addEventListener("click", function () {
+      if (!armed) { armed = true; btn.textContent = "再按一次確定（三個遊戲的所有資料都會清空）"; btn.classList.add("armed"); timer = setTimeout(disarm, 4000); return; }
+      disarm(); msg.textContent = "清除中…"; msg.className = "hi-msg";
+      Promise.all([
+        run("好友冰狗", function () { return BingoStore.create().reset(); }),
+        run("迷因海公牛", function () { return QuizStore.create().clearAll(); }),
+        run("陪酒小姐", function () { return CardStore.create().clearAll(); })
+      ]).then(function (rs) {
+        var bad = rs.filter(function (r) { return !r.ok; });
+        msg.className = "hi-msg " + (bad.length ? "bad" : "good");
+        msg.textContent = bad.length ? "⚠ 這幾個沒清成功：" + bad.map(function (r) { return r.name + "（" + r.err + "）"; }).join("、") + "。請再按一次，或到各個中控台按「重置」。"
+          : "✅ 已全部清空：好友冰狗、迷因海公牛、陪酒小姐（玩家、分數、分組、桌次、自由開局的房間）";
+      });
+    });
+  })();
+</script>
 </body>
 </html>

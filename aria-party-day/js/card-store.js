@@ -91,6 +91,7 @@
       },
       roomEnd: function (id) { var r = state.rooms && state.rooms[id]; if (r) { r.ended = true; commit(); } return Promise.resolve(); },
       roomDelete: function (id) { if (state.rooms && state.rooms[id]) { delete state.rooms[id]; commit(); } return Promise.resolve(); },
+      clearAll: function () { state = blank(); commit(); return Promise.resolve(); },     // 全部清空：主遊戲、自由開局的房間、「手機是自由開局」的切換都回到一開始
       reset: function () { var keep = state.rooms || {}, free = state.free; state = blank(); state.rooms = keep; state.free = !!free; commit(); return Promise.resolve(); }   // 只重置主遊戲，自由開局的房間和「手機是不是自由開局」都不動
     };
   }
@@ -169,6 +170,7 @@
       roomUseToilet: function (id, n) { return put("card/rooms/" + id + "/used/" + n, true); },
       roomEnd: function (id) { return put("card/rooms/" + id + "/ended", true); },
       roomDelete: function (id) { return put("card/rooms/" + id, null); },
+      clearAll: function () { return ready.then(function (h) { return h.d.set(h.d.ref(h.db, "card"), null); }); },
       reset: function () {          // 只重置主遊戲（開局設定 + 人數進場），玩家自己開的房間不動
         return ready.then(function (h) {
           return Promise.all([h.d.set(h.d.ref(h.db, "card/status"), "lobby"), h.d.set(h.d.ref(h.db, "card/mode"), "roster"), h.d.set(h.d.ref(h.db, "card/scoring"), null),

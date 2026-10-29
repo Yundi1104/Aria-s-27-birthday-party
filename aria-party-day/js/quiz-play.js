@@ -173,7 +173,7 @@
       inner.innerHTML = ""; refs = {};
       addNote();
 
-      var scoreText = team < 0 ? "沒有分組" : K.teamLabel(team) + (state.revealed >= 0 && trow && trow.rank ? "・第 " + trow.rank + " 名" : "");
+      var scoreText = team < 0 ? "沒有分組" : K.teamLabel(team);                       // 名次不在手機上顯示（留到頒獎才揭曉）
       inner.appendChild(el("div", { "class": "qp-top" }, [
         backBtn(true),
         el("div", { "class": "bp-who" }, [el("span", { "class": "bp-dot" + (connected ? "" : " off") }), p.name]),
@@ -252,7 +252,7 @@
         inner.appendChild(el("div", { "class": cls2, text: msg }));
         if (team >= 0 && trow) {
           var right = K.playersOfTeam(state, team).filter(function (pid) { var x = K.evalAnswer(state, qi, pid); return x && x.correct; }).length;
-          inner.appendChild(el("div", { "class": "qp-teamres", text: K.teamLabel(team) + " 這題 " + right + " / " + trow.size + " 人答對　目前本組答對 " + trow.correct + " 題" + (trow.rank ? "（第 " + trow.rank + " 名）" : "") }));
+          inner.appendChild(el("div", { "class": "qp-teamres", text: K.teamLabel(team) + " 這題 " + right + " / " + trow.size + " 人答對　目前本組答對 " + trow.correct + " 題" }));
         }
         var ex = K.extraOf(state, qi, me);
         if (ex) inner.appendChild(el("div", { "class": "qp-result good", text: "🎁 額外加分 +" + ex }));
@@ -321,18 +321,10 @@
       var trow = team >= 0 ? board.teams[team] : null;
       inner.appendChild(el("div", { "class": "qp-final" }, [
         el("div", { "class": "qp-final-title", text: "🏆 迷因海公牛結束" }),
-        trow ? el("div", { "class": "qp-final-me", text: K.teamLabel(team) + " 第 " + trow.rank + " 名" }) : el("div", { "class": "qp-final-me", text: "這局你沒有分組" }),
-        trow ? el("div", { "class": "qp-final-sub", text: "你答對 " + (mine ? mine.correct : 0) + " 題 +" + (mine ? mine.personal : 0) + "　組別名次每人 +" + trow.bonus + "　共 +" + (mine ? mine.total : 0) + " 分" }) : null
+        trow ? el("div", { "class": "qp-final-me", text: K.teamLabel(team) + "　本組答對 " + trow.correct + " 題" }) : el("div", { "class": "qp-final-me", text: "這局你沒有分組" }),
+        trow ? el("div", { "class": "qp-final-sub", text: "你答對 " + (mine ? mine.correct : 0) + " 題　個人 +" + (mine ? mine.personal : 0) + " 分" }) : null,
+        trow ? el("div", { "class": "qp-final-sub", text: "名次和組別加分，等頒獎時一起揭曉 🎁" }) : null
       ]));
-      var list = el("div", { "class": "qp-top3" });
-      board.ranked.slice(0, 5).forEach(function (t) {
-        var row = el("div", { "class": "qp-top3-row" + (t.team === team ? " me" : "") }, [
-          el("span", { text: t.rank <= 3 ? ["🥇", "🥈", "🥉"][t.rank - 1] : t.rank + "." }), el("span", { "class": "nm", text: t.icon + " " + t.name }),
-          el("span", { "class": "pt", text: "答對 " + t.correct + " 題　每人 +" + t.bonus })
-        ]);
-        list.appendChild(row);
-      });
-      inner.appendChild(list);
     }
 
     // 倒數條：每 0.2 秒更新（只動時間和進度條，不重畫整個畫面）

@@ -51,6 +51,8 @@
     var btnReset = el("button", { "class": "bh-btn danger", type: "button", text: "重置", onclick: onReset });
     var btnFree = el("button", { "class": "bh-btn", type: "button", onclick: function () { store.setFree(!state.free); } });   // 手機切換：主遊戲 ⇄ 自由開局（不計分）
     var controls = el("div", { "class": "bh-controls" }, [btnFree, btnStart, btnEnd, btnReset]);
+    // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來；按 H 把按鈕藏起來時它也會藏起來
+    if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
         el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
@@ -80,10 +82,18 @@
     // ---------- 開局前：指定誰來玩（人數 + 名單）----------
     function online(pid) { return !!state.players[pid]; }
     function nameRow(pid, i) {
-      return el("div", { "class": "ch-name" + (online(pid) ? " on" : "") }, [
+      return el("div", { "class": "ch-name" + (online(pid) ? " on" : ""), "data-pid": pid }, [
         el("span", { "class": "no", text: String(i + 1) }), el("span", { "class": "dot" }), el("span", { "class": "nm", text: nameOf(pid) })
       ]);
     }
+    // 拖移：名字可以從左邊的名單拖到右邊的桌子（插在放開的位置）、在桌子之間拖、拖回左邊的名單 = 這局不玩
+    function dropTo(pid, zone, beforePid) {
+      var t = tableIdx(pid); if (t >= 0) plan.tables[t].splice(plan.tables[t].indexOf(pid), 1);
+      var k = zone === "pool" ? -1 : parseInt(String(zone).slice(1), 10);
+      if (k >= 0 && k < plan.tables.length) { var arr = plan.tables[k], bi = beforePid ? arr.indexOf(beforePid) : -1; if (bi >= 0) arr.splice(bi, 0, pid); else arr.push(pid); }
+      update();
+    }
+    PartyDnd.enable(main, { itemSel: ".ch-name", zoneSel: "[data-zone]", keyOf: function (e) { return e.getAttribute("data-pid"); }, onDrop: dropTo });
     function setCount(n) {
       n = Math.max(1, Math.min(CD.CONFIG.MAX_TABLES || 3, n));
       while (plan.tables.length < n) plan.tables.push([]);
@@ -128,13 +138,13 @@
       main.appendChild(bar2);
 
       var capTxt = !picked.length ? "" : cap === Infinity ? "　每張牌都算分" : "　52 張牌平分給大家，每人前 " + cap + " 張計分（抽到數字幾 +幾分）";
-      main.appendChild(el("div", { "class": "ch-hint", text: "點名字加入／換桌／移出（沒被點到的人 = 這局不玩）。已選 " + picked.length + " 人（至少每桌 2 人）。🟢 = 已用手機進場" + capTxt }));
+      main.appendChild(el("div", { "class": "ch-hint", text: "把名字拖到右邊的桌子（也可以在桌子裡拖來調順序、拖回左邊 = 不玩），或點名字換桌（沒被選的人 = 這局不玩）。已選 " + picked.length + " 人（至少每桌 2 人）。🟢 = 已用手機進場" + capTxt }));
 
-      var pick = el("div", { "class": "bh-panel ch-setbox" }, [el("h2", { text: "名單（點選）" })]);
+      var pick = el("div", { "class": "bh-panel ch-setbox", "data-zone": "pool" }, [el("h2", { text: "名單（拖到右邊的桌子，或點一下）" })]);
       var grid = el("div", { "class": "ch-names two" });
       allPids.forEach(function (pid) {
         var t = tableIdx(pid), i = t >= 0 ? plan.tables[t].indexOf(pid) : -1;
-        var row = el("div", { "class": "ch-name click" + (online(pid) ? " on" : "") + (t >= 0 ? " picked" : "") }, [
+        var row = el("div", { "class": "ch-name click" + (online(pid) ? " on" : "") + (t >= 0 ? " picked" : ""), "data-pid": pid }, [
           el("span", { "class": "no", text: i >= 0 ? String(i + 1) : "" }), el("span", { "class": "dot" }), el("span", { "class": "nm", text: nameOf(pid) }),
           count > 1 && t >= 0 ? el("span", { "class": "tg", text: "桌" + (t + 1) }) : null
         ]);
@@ -144,7 +154,7 @@
       pick.appendChild(grid);
       var ords = el("div", { "class": "ch-ords" });
       plan.tables.forEach(function (order, t) {
-        var box = el("div", { "class": "bh-panel ch-setbox" }, [el("h2", { text: count > 1 ? "第 " + (t + 1) + " 桌（" + order.length + " 人）" : "輪流順序（" + order.length + " 人）" })]);
+        var box = el("div", { "class": "bh-panel ch-setbox", "data-zone": "t" + t }, [el("h2", { text: count > 1 ? "第 " + (t + 1) + " 桌（" + order.length + " 人）" : "輪流順序（" + order.length + " 人）" })]);
         var list = el("div", { "class": "ch-names" + (order.length > 10 ? " two" : "") });
         order.forEach(function (pid, i) { list.appendChild(nameRow(pid, i)); });
         if (!order.length) list.appendChild(el("div", { "class": "bh-empty", text: "還沒有選人" }));
@@ -266,15 +276,16 @@
       store.subscribe(function (s) { state = s; update(); });
       if (store.onConnection) store.onConnection(function (ok) { connected = ok; update(); });
     }
-    var needPin = opts.pin && !(function () { try { return sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
+    var needPin = opts.pin && !(function () { try { return (root.HostAuth && root.HostAuth.ok()) || sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
     if (needPin) {
       var input = el("input", { type: "password", placeholder: "中控台密碼", autocomplete: "off" });
       var err = el("div", { "class": "err" });
       var gate = el("div", { "class": "bh-pin" });
+      if (opts && opts.backHref) gate.appendChild(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 回主持人入口" }));
       var form = el("form", {}, [el("h2", { text: "🔒 陪酒小姐中控台" }), input, err, el("button", { "class": "bh-btn primary", type: "submit", text: "進入" })]);
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (input.value === opts.pin) { try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
+        if (input.value === opts.pin) { if (root.HostAuth) root.HostAuth.set(); try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
         else { err.textContent = "密碼不對"; input.value = ""; }
       });
       gate.appendChild(form); stage.appendChild(gate);

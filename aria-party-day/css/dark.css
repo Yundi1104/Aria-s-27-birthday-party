@@ -18,8 +18,8 @@ html[data-theme="dark"], html[data-theme="dark"] body{background:#111a24;color-s
 
 /* ---------- 背景圖：蓋一層深色 ---------- */
 html[data-theme="dark"] .bp-wrap{background-color:#111a24;background-image:linear-gradient(rgba(12,18,27,.86),rgba(12,18,27,.86)),url(../images/background.png);}
-html[data-theme="dark"] .pg-wrap{background:#111a24;}
-html[data-theme="dark"] .pg-wrap::before{background-color:#111a24;background-image:linear-gradient(rgba(12,18,27,.86),rgba(12,18,27,.86)),url(../images/background.png);}
+html[data-theme="dark"] .pg-wrap{background-color:#111a24;background-image:linear-gradient(rgba(12,18,27,.86),rgba(12,18,27,.86)),url(../images/background-tile.jpg);background-size:100% 100%,100% auto;background-repeat:repeat,repeat-y;background-position:center top;}
+html[data-theme="dark"]{background:#111a24;}
 
 /* ---------- 白色的卡片、按鈕 → 深色 ---------- */
 :where(html[data-theme="dark"]) .bp-return,
@@ -112,4 +112,3 @@ html[data-theme="dark"] .pg-gear{background:rgba(29,40,54,.94);}
 .pg-set-seg button{flex:1;border:2px solid var(--blue-mid);background:var(--blue-pale);color:var(--ink);border-radius:14px;padding:12px 6px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
 .pg-set-seg button.on{background:var(--yellow);border-color:var(--yellow-border);color:#1b2430;}
 
-html[data-theme="dark"] .pg-locktxt{color:var(--blue-deep);}

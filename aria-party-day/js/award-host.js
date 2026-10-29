@@ -37,6 +37,8 @@
     var btnPeek = el("button", { "class": "bh-btn", type: "button", text: "👀 偷看排名（會劇透）", onclick: function () { goPeek(true); } });
     var btnSound = el("button", { "class": "bh-btn", type: "button", text: "🔊 音效", onclick: function () { muted = !muted; btnSound.textContent = muted ? "🔇 靜音" : "🔊 音效"; } });
     var controls = el("div", { "class": "bh-controls" }, [btnMain, btnPeek, btnSound]);
+    // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來；按 H 把按鈕藏起來時它也會藏起來
+    if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
         el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
@@ -315,15 +317,16 @@
       stores.quiz.subscribe(function (s) { qState = s; update(); });
       if (stores.card) stores.card.subscribe(function (s) { cState = s; update(); });
     }
-    var needPin = opts.pin && !(function () { try { return sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
+    var needPin = opts.pin && !(function () { try { return (root.HostAuth && root.HostAuth.ok()) || sessionStorage.getItem(PIN_KEY) === "1"; } catch (e) { return false; } })();
     if (needPin) {
       var input = el("input", { type: "password", placeholder: "中控台密碼", autocomplete: "off" });
       var err = el("div", { "class": "err" });
       var gate = el("div", { "class": "bh-pin" });
+      if (opts && opts.backHref) gate.appendChild(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 回主持人入口" }));
       var form = el("form", {}, [el("h2", { text: "🔒 頒獎中控台" }), input, err, el("button", { "class": "bh-btn primary", type: "submit", text: "進入" })]);
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (input.value === opts.pin) { try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
+        if (input.value === opts.pin) { if (root.HostAuth) root.HostAuth.set(); try { sessionStorage.setItem(PIN_KEY, "1"); } catch (x) {} gate.remove(); startListening(); }
         else { err.textContent = "密碼不對"; input.value = ""; }
       });
       gate.appendChild(form); stage.appendChild(gate);

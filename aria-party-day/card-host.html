@@ -18,9 +18,11 @@
 <script src="js/card-core.js"></script>
 <script src="js/card-store.js"></script>
 <script src="js/card-play.js"></script>
+<script src="js/party-dnd.js"></script>
+<script src="js/host-auth.js"></script>
 <script src="js/card-host.js"></script>
 <script>
-  CardGame.mountHost(document.getElementById("app"), CardStore.create(), { pin: BINGO_DATA.CONFIG.HOST_PIN });
+  CardGame.mountHost(document.getElementById("app"), CardStore.create(), { pin: BINGO_DATA.CONFIG.HOST_PIN, backHref: "host-index.html" });
 </script>
 </body>
 </html>
