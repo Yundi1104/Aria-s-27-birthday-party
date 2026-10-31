@@ -13,8 +13,8 @@
 .qp-img{display:block;width:100%;max-height:30vh;object-fit:contain;border-radius:14px;background:#fff;margin-bottom:10px;}
 .qp-q{font-size:20px;font-weight:800;line-height:1.45;margin:2px 2px 12px;}
 
-.qp-opts{display:flex;flex-direction:column;gap:9px;}
-.qp-opt{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:3px solid transparent;border-radius:14px;
+.qp-opts{display:flex;flex-direction:column;gap:7px;}
+.qp-opt{display:flex;align-items:center;gap:12px;width:100%;padding:8px 14px;border:3px solid transparent;border-radius:14px;
   font-size:18px;font-weight:700;color:var(--ink);text-align:left;cursor:pointer;background:var(--opt-a);}
 .qp-opt.b{background:var(--opt-b);} .qp-opt.c{background:var(--opt-c);} .qp-opt.d{background:var(--opt-d);}
 .qp-opt:active{transform:scale(.985);}
@@ -217,3 +217,10 @@
 .qh-pool{grid-column:1 / -1;background:rgba(255,255,255,.55);}
 .qh-zone .qh-pchip{cursor:grab;}
 .qh-zone .qh-pchip{height:40px;font-size:17px;padding:0 10px;gap:6px;}
+
+/* 個人戰 / 分組戰 的切換鈕（分組畫面最上面） */
+.qh-modesw{display:inline-flex;gap:0;border-radius:99px;overflow:hidden;border:3px solid var(--ink);background:#fff;}
+.qh-modebtn{border:none;background:transparent;font-size:17px;font-weight:800;padding:8px 18px;cursor:pointer;color:var(--ink);font-family:inherit;}
+.qh-modebtn.on{background:var(--ink);color:#fff;}
+.qh-solo-box{background:rgba(255,255,255,.7);border-radius:14px;padding:10px;}
+.qh-pchip.solo{cursor:default;}

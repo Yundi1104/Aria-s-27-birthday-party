@@ -35,11 +35,16 @@
     var stat = el("span", { "class": "bh-stat" });
     var conn = el("span", { "class": "bh-conn" });
     var btnStart = el("button", { "class": "bh-btn primary", type: "button", onclick: onStart });
-    var btnPlus = el("button", { "class": "bh-btn", type: "button", text: "+1 分", onclick: function () { store.extend(60); } });
-    var btnMinus = el("button", { "class": "bh-btn", type: "button", text: "−1 分", onclick: function () { var r = remainingSec(); if (r != null && r > 60) store.extend(-60); } });
-    // 快捷：一次加 10 分鐘、1 小時（遊戲進行中才會出現）
-    var btnPlus10 = el("button", { "class": "bh-btn", type: "button", text: "+10 分", title: "再加 10 分鐘", onclick: function () { store.extend(600); } });
-    var btnPlus60 = el("button", { "class": "bh-btn", type: "button", text: "+1 小時", title: "再加 1 小時", onclick: function () { store.extend(3600); } });
+    // 遊戲進行中要調整剩餘時間：用下拉選單（選了就加／減，選完會跳回「調整時間」），不佔一排按鈕
+    chip.style.display = "none";                                                  // 「進行中／已結束」小標籤不顯示了（內容還是會更新，方便測試和除錯）
+    var timeSel = el("select", { "class": "qh-secsel bh-timesel", title: "調整剩餘時間" });
+    timeSel.appendChild(el("option", { value: "", text: "⏱ 調整時間" }));
+    [[1, "＋ 1 分鐘"], [5, "＋ 5 分鐘"], [10, "＋ 10 分鐘"], [30, "＋ 30 分鐘"], [60, "＋ 1 小時"], [-1, "－ 1 分鐘"], [-5, "－ 5 分鐘"]].forEach(function (x) { timeSel.appendChild(el("option", { value: String(x[0] * 60), text: x[1] })); });
+    timeSel.addEventListener("change", function () {
+      var v = Number(timeSel.value); timeSel.value = ""; if (!v) return;
+      if (v < 0) { var r = remainingSec(); if (r == null || r <= -v + 10) return; }          // 減時間時，至少要留 10 秒
+      store.extend(v);
+    });
     // 這局要倒數多久：開始前由主持人選（預設 = bingo-data.js 的 GAME_MINUTES；0 = 不限時，主持人自己按「結束遊戲」）
     var minutes = CFG.GAME_MINUTES || 0;
     var minSel = el("select", { "class": "qh-secsel bh-minsel", title: "這局倒數幾分鐘" });
@@ -50,12 +55,12 @@
     minSel.addEventListener("change", function () { minutes = Number(minSel.value); tickClock(); });
     var btnEnd = el("button", { "class": "bh-btn", type: "button", text: "結束遊戲", onclick: function () { store.setStatus("ended"); } });
     var btnReset = el("button", { "class": "bh-btn danger", type: "button", text: "重置", onclick: onReset });
-    var controls = el("div", { "class": "bh-controls" }, [minSel, btnStart, btnMinus, btnPlus, btnPlus10, btnPlus60, btnEnd, btnReset]);
+    var controls = el("div", { "class": "bh-controls" }, [minSel, btnStart, timeSel, btnEnd, btnReset]);
     // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來；按 H 把按鈕藏起來時它也會藏起來
     if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
-        el("div", { "class": "bh-title", text: CFG.HOST_TITLE || CFG.TITLE }),
+        el("div", { "class": "bh-title", text: "好友冰狗" }),                          // 寫遊戲名稱，投影出來大家才知道是什麼遊戲
         CFG.HOST_SUBTITLE ? el("div", { "class": "bh-sub", text: CFG.HOST_SUBTITLE }) : null
       ]),
       chip, clock, stat,
@@ -113,9 +118,9 @@
     });
 
     // ---------- 主畫面 ----------
-    var rows = Math.ceil(D.GUESTS.length / 5);
+    var COLS = 7, rows = Math.ceil(D.GUESTS.length / COLS);                      // 21 位 = 7 欄 × 3 列：每張小卡夠高，5×5 的格子完整顯示
     var grid = el("div", { "class": "bh-grid" });
-    grid.style.gridTemplateRows = "repeat(" + rows + ",1fr)";
+    grid.style.gridTemplateColumns = "repeat(" + COLS + ",1fr)"; grid.style.gridTemplateRows = "repeat(" + rows + ",1fr)";
     var panelDone = el("div", { "class": "bh-panel", style: "flex:1;overflow:hidden;" });
     var panelChase = el("div", { "class": "bh-panel" });
     stage.appendChild(el("div", { "class": "bh-main" }, [
@@ -237,8 +242,7 @@
       stat.textContent = "已簽到 " + comp.rows.length + "/" + D.GUESTS.length;
       btnStart.textContent = state.status === "ended" ? "繼續遊戲" : "開始遊戲";
       btnStart.disabled = state.status === "playing";
-      btnPlus.style.display = state.status === "playing" && state.durationSec ? "" : "none";
-      btnMinus.style.display = btnPlus10.style.display = btnPlus60.style.display = btnPlus.style.display;
+      timeSel.style.display = state.status === "playing" && state.durationSec ? "" : "none";
       minSel.style.display = state.status === "playing" ? "none" : "";
       btnEnd.disabled = state.status !== "playing";
       var base = "點任一張卡片可看詳細盤面．按 H 可隱藏按鈕";

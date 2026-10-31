@@ -22,10 +22,9 @@
 <script src="js/card-store.js"></script>
 <script src="js/award-data.js"></script>
 <script src="js/award-core.js"></script>
-<script src="js/host-auth.js"></script>
 <script src="js/award-host.js"></script>
 <script>
-  AwardGame.mountHost(document.getElementById("app"), { bingo: BingoStore.create(), quiz: QuizStore.create(), card: CardStore.create() }, { pin: BINGO_DATA.CONFIG.HOST_PIN, backHref: "host-index.html" });
+  AwardGame.mountHost(document.getElementById("app"), { bingo: BingoStore.create(), quiz: QuizStore.create(), card: CardStore.create() }, { backHref: "host-index.html" });
 </script>
 </body>
 </html>

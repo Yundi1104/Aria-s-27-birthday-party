@@ -166,24 +166,25 @@
       var mine = board.players.filter(function (r) { return r.pid === me; })[0] || null, trow = team >= 0 ? board.teams[team] : null;
       var status = state.status, qi = state.index, q = Q.QUESTIONS[qi], chosen = (q ? myAnswer() : null);
       var isBz = K.isBuzz(qi), bz = isBz && status !== "lobby" ? K.buzzRank(state, qi, me) + ":" + myBuzz() + ":" + (state.judge && state.judge[qi] ? state.judge[qi][me] : "") : "";
-      var sig = [status, qi, chosen, bz, mine ? mine.total + ":" + mine.correct : "-", trow ? trow.rank + ":" + trow.score + ":" + trow.size : "-", team, K.teamsOf(state).count, state.revealed, connected, K.secondsFor(qi, state)].join("|");
+      var sig = [status, qi, chosen, bz, mine ? mine.total + ":" + mine.correct : "-", trow ? trow.rank + ":" + trow.score + ":" + trow.size : "-", team, K.teamsOf(state).count, K.isSolo(state), state.revealed, connected, K.secondsFor(qi, state)].join("|");
       if (sig === lastSig) return;                 // 別人答題不用重畫（也不會洩漏他們的答案）
       lastSig = sig;
 
       inner.innerHTML = ""; refs = {};
       addNote();
 
-      var scoreText = team < 0 ? "沒有分組" : K.teamLabel(team);                       // 名次不在手機上顯示（留到頒獎才揭曉）
+      var solo = K.isSolo(state), soloLabel = "🧍 個人戰";
+      var scoreText = team < 0 ? "沒有分組" : solo ? soloLabel : K.teamLabel(team);                       // 名次不在手機上顯示（留到頒獎才揭曉）
       inner.appendChild(el("div", { "class": "qp-top" }, [
         backBtn(true),
         el("div", { "class": "bp-who" }, [el("span", { "class": "bp-dot" + (connected ? "" : " off") }), p.name]),
         el("div", { "class": "qp-score", text: scoreText }),
         el("button", { "class": "bp-link", type: "button", text: "計分", onclick: openScoring }),
-        el("button", { "class": "bp-link", type: "button", text: "換人", onclick: switchUser })
+        null
       ]));
       if (team >= 0 && status !== "lobby" && status !== "ended") {
-        var bar = el("div", { "class": "qp-teambar", text: K.teamLabel(team) + "　你答對 " + (mine ? mine.correct : 0) + " 題　本組答對 " + (trow ? trow.correct : 0) + " 題" });
-        bar.style.background = K.teamColor(team); inner.appendChild(bar);
+        var bar = el("div", { "class": "qp-teambar", text: solo ? soloLabel + "　你答對 " + (mine ? mine.correct : 0) + " 題" : K.teamLabel(team) + "　你答對 " + (mine ? mine.correct : 0) + " 題　本組答對 " + (trow ? trow.correct : 0) + " 題" });
+        bar.style.background = solo ? "#8fa7bd" : K.teamColor(team); inner.appendChild(bar);
       } else if (team < 0 && status !== "lobby" && status !== "ended") {
         inner.appendChild(el("div", { "class": "qp-observe", text: "👀 這局你沒有分組，用看的就好" }));
       }
@@ -192,10 +193,10 @@
         inner.appendChild(el("div", { "class": "bp-note" }, ["✅ 已進場"]));
         inner.appendChild(el("div", { "class": "qp-rules" }, [
           "共 " + K.total() + " 題，看大螢幕作答", el("br"),
-          "時間到之前可以改答案，可以跟組員討論", el("br"),
+          solo ? "時間到之前可以改答案" : "時間到之前可以改答案，可以跟組員討論", el("br"),
           "搶答題：題目出現 " + K.buzzDelay() + " 秒後才能按搶答鈕", el("br"),
           "每答對 1 題 +" + Q.CONFIG.POINTS_PER_CORRECT + " 分", el("br"),
-          "最後依組別名次，該組每個人加 " + bonusText() + " 分"
+          solo ? "個人戰：最後依個人分數排名，前面的人加 " + bonusText() + " 分" : "最後依組別名次，該組每個人加 " + bonusText() + " 分"
         ]));
         return;
       }
@@ -252,7 +253,7 @@
         inner.appendChild(el("div", { "class": cls2, text: msg }));
         if (team >= 0 && trow) {
           var right = K.playersOfTeam(state, team).filter(function (pid) { var x = K.evalAnswer(state, qi, pid); return x && x.correct; }).length;
-          inner.appendChild(el("div", { "class": "qp-teamres", text: K.teamLabel(team) + " 這題 " + right + " / " + trow.size + " 人答對　目前本組答對 " + trow.correct + " 題" }));
+          inner.appendChild(el("div", { "class": "qp-teamres", text: solo ? "全場這題 " + right + " / " + trow.size + " 人答對" : K.teamLabel(team) + " 這題 " + right + " / " + trow.size + " 人答對　目前本組答對 " + trow.correct + " 題" }));
         }
         var ex = K.extraOf(state, qi, me);
         if (ex) inner.appendChild(el("div", { "class": "qp-result good", text: "🎁 額外加分 +" + ex }));
@@ -262,11 +263,12 @@
       tick();
     }
 
-    // 題目圖片（揭曉時有答案圖就換成答案圖）；影片只在大螢幕播
+    // 題目圖片（沒有影片時，揭曉有答案圖就換成答案圖）；影片只在大螢幕播。
+    // 圖 + 影片都有的題目：手機一直看得到圖；揭曉時再提醒「請看大螢幕的影片」
     function addMedia(q, reveal) {
-      var src = reveal && q.answerImg ? q.answerImg : q.img;
+      var src = reveal && q.answerImg && !q.video ? q.answerImg : q.img;
       if (src) inner.appendChild(el("img", { "class": "qp-img", src: src, alt: "" }));
-      if (q.video && !(reveal && q.answerImg)) inner.appendChild(el("div", { "class": "qp-video", text: "🎬 請看大螢幕的影片（有聲音）" }));
+      if (q.video && (!q.img || reveal)) inner.appendChild(el("div", { "class": "qp-video", text: reveal && q.img ? "🎬 答案請看大螢幕的影片" : "🎬 請看大螢幕的影片（有聲音）" }));
     }
 
     // 搶答題：手機只有一顆搶答鈕
@@ -321,7 +323,7 @@
       var trow = team >= 0 ? board.teams[team] : null;
       inner.appendChild(el("div", { "class": "qp-final" }, [
         el("div", { "class": "qp-final-title", text: "🏆 迷因海公牛結束" }),
-        trow ? el("div", { "class": "qp-final-me", text: K.teamLabel(team) + "　本組答對 " + trow.correct + " 題" }) : el("div", { "class": "qp-final-me", text: "這局你沒有分組" }),
+        trow ? el("div", { "class": "qp-final-me", text: K.isSolo(state) ? "🧍 個人戰　你答對 " + (mine ? mine.correct : 0) + " 題" : K.teamLabel(team) + "　本組答對 " + trow.correct + " 題" }) : el("div", { "class": "qp-final-me", text: "這局你沒有分組" }),
         trow ? el("div", { "class": "qp-final-sub", text: "你答對 " + (mine ? mine.correct : 0) + " 題　個人 +" + (mine ? mine.personal : 0) + " 分" }) : null,
         trow ? el("div", { "class": "qp-final-sub", text: "名次和組別加分，等頒獎時一起揭曉 🎁" }) : null
       ]));

@@ -5,7 +5,8 @@
  *   { status: 'lobby'|'intro'|'question'|'reveal'|'ended', index: 目前第幾題(QUESTIONS 的位置，0 開始), revealed: 已揭曉到第幾題,
  *     starts: { 題號: 這題開始的時間 }, durs: { 題號: 主持人設定的秒數（0 = 不倒數）}, revealAt: { 題號: 揭曉的時間 },
  *     players: { pid: { name } },
- *     teams: { count: 幾組, assign: { pid: 組別編號(0開始) }, mode: 'sum'|'average'(可不寫) },   ← 沒在 assign 裡的人 = 這局不玩
+ *     teams: { count: 幾組, assign: { pid: 組別編號(0開始) }, mode: 'sum'|'average'(可不寫), solo: true(可不寫) },   ← 沒在 assign 裡的人 = 這局不玩
+ *     solo: true = 「個人戰」：不分組，所有已簽到的人都直接答題，各自計分、依個人分數排名（名次加分用同一份 TEAM_BONUS）
  *     answers: { 題號: { pid: { choice: 0~3, at: 最後一次改答案的時間 } } },   ← 選擇題：時間到之前可以一直改，只算最後一次
  *     buzz:    { 題號: { pid: 按下搶答的時間 } },                              ← 搶答題：每人只算第一次按
  *     judge:   { 題號: { pid: true(答對) | false(答錯) } },                    ← 搶答題：主持人判定
@@ -90,22 +91,27 @@
   function buzzRank(state, i, pid) { var r = buzzList(state, i).filter(function (x) { return x.pid === pid; })[0]; return r ? r.rank : 0; }
 
   // ---------- 分組 ----------
+  function isSolo(state) { return !!(state && state.teams && state.teams.solo); }          // 個人戰（不分組）
+  function joinedPids(state) { return Object.keys((state && state.players) || {}).sort(); }
   function teamsOf(state) {
     var t = (state && state.teams) || {};
-    return { count: Math.max(0, Number(t.count) || 0), assign: t.assign || {}, mode: t.mode === "average" || t.mode === "sum" ? t.mode : null };
+    return { count: isSolo(state) ? 1 : Math.max(0, Number(t.count) || 0), assign: t.assign || {}, mode: t.mode === "average" || t.mode === "sum" ? t.mode : null, solo: isSolo(state) };
   }
   // 這個人在第幾組（0 開始）；沒分組 / 這局不玩 = -1
   function teamOf(state, pid) {
+    if (isSolo(state)) return state.players && state.players[pid] ? 0 : -1;               // 個人戰：所有已簽到的人都在「第 0 組」（只是內部用的假組別）
     var T = teamsOf(state), v = T.assign[pid];
     if (v == null || v === "" || isNaN(Number(v))) return -1;
     v = Number(v);
     return v >= 0 && v < T.count ? v : -1;
   }
   function playersOfTeam(state, t) {
+    if (isSolo(state)) return t === 0 ? joinedPids(state) : [];
     var T = teamsOf(state);
     return Object.keys(T.assign).filter(function (pid) { return teamOf(state, pid) === t; }).sort();
   }
   function assignedPids(state) {
+    if (isSolo(state)) return joinedPids(state);
     var T = teamsOf(state);
     return Object.keys(T.assign).filter(function (pid) { return teamOf(state, pid) >= 0; }).sort();
   }
@@ -173,6 +179,7 @@
   function scoreboard(state) {
     var c = cfg(), through = state.revealed == null ? -1 : Number(state.revealed);
     var T = teamsOf(state), mode = T.mode || c.TEAM_SCORE;                 // 組別怎麼比：中控台可以臨時切換，沒切就用設定檔
+    if (isSolo(state)) return soloBoard(state, through);
     var idx = order().filter(function (i) { return i <= through; });
     var players = assignedPids(state).map(function (pid) {
       var correct = 0, points = 0, extra = 0, gain = 0;
@@ -208,6 +215,24 @@
     return { players: players, teams: teams, ranked: ranked, final: state.status === "ended", mode: mode };
   }
 
+  // 個人戰：每個人各自一列；依個人分數（答對分 + 額外加分）排名，同分並列；名次加分用 TEAM_BONUS（第 1 名 +50、第 2 名 +40…）
+  // 為了讓中控台的名次表和頒獎台可以沿用，ranked 裡每一個人是一個「只有 1 人的組」。
+  function soloBoard(state, through) {
+    var c = cfg(), idx = order().filter(function (i) { return i <= through; });
+    var players = joinedPids(state).map(function (pid) {
+      var correct = 0, points = 0, extra = 0, gain = 0;
+      idx.forEach(function (i) { var ok = isCorrect(state, i, pid); extra += extraOf(state, i, pid); if (ok) { correct++; points += pointsFor(i); if (i === through) gain = 1; } });
+      return { pid: pid, name: nameOf(state, pid), team: 0, correct: correct, extra: extra, personal: points + extra, gain: gain, bonus: 0, total: 0, rank: 0 };
+    });
+    var byScore = players.slice().sort(function (a, b) { return b.personal - a.personal || b.correct - a.correct || String(a.name).localeCompare(String(b.name), "zh-Hant"); });
+    byScore.forEach(function (p, i) { var prev = byScore[i - 1]; p.rank = prev && prev.personal === p.personal ? prev.rank : i + 1; p.bonus = (c.TEAM_BONUS || [])[p.rank - 1] || 0; p.total = p.personal + p.bonus; });
+    var ranked = byScore.map(function (p, i) { return { team: i, pid: p.pid, name: p.name, icon: "🧍", members: [p.pid], size: 1, correct: p.correct, avg: p.correct, gain: p.gain, score: p.personal, rank: p.rank, bonus: p.bonus }; });
+    var sum = players.reduce(function (a, p) { return a + p.correct; }, 0);
+    var teams = [{ team: 0, name: "個人戰", icon: "🧍", members: players.map(function (p) { return p.pid; }), size: players.length, correct: sum, avg: players.length ? Math.round(sum / players.length * 100) / 100 : 0, gain: players.reduce(function (a, p) { return a + p.gain; }, 0), score: sum, rank: 1, bonus: 0 }];
+    players.sort(function (a, b) { return b.total - a.total || b.correct - a.correct || String(a.name).localeCompare(String(b.name), "zh-Hant"); });
+    return { players: players, teams: teams, ranked: ranked, final: state.status === "ended", mode: "solo", solo: true };
+  }
+
   // ---------- 影片網址 → 內嵌播放器 ----------
   // 回傳 { kind: 'iframe'|'video', src, open(原始網址) }
   // 網址裡的開始時間：?t=94、&t=94s、?t=1m34s、&start=94 都可以 → 從第幾秒開始播
@@ -228,7 +253,7 @@
   }
 
   root.QuizCore = {
-    question: question, isBuzz: isBuzz, order: order, total: total, displayNo: displayNo, firstIndex: firstIndex, lastIndex: lastIndex,
+    isSolo: isSolo, question: question, isBuzz: isBuzz, order: order, total: total, displayNo: displayNo, firstIndex: firstIndex, lastIndex: lastIndex,
     nextIndex: nextIndex, prevIndex: prevIndex, category: category, catInfo: catInfo, isCatStart: isCatStart,
     defaultSeconds: defaultSeconds, secondsFor: secondsFor, startOf: startOf, remaining: remaining,
     buzzDelay: buzzDelay, unlockAt: unlockAt, buzzList: buzzList, buzzRank: buzzRank,

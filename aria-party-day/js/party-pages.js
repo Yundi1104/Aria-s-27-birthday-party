@@ -38,7 +38,7 @@
   // ---------- 入口頁 ----------
   function mountHub(host, ctx) {
     ctx = ctx || {};
-    var H = P.HUB, inner = shell(host, ctx), scoreBox = el("div", { "class": "pg-score" });
+    var H = P.HUB, inner = shell(host, ctx);
     var latest = { bingo: null, quiz: null, card: null };
 
     // 右上角齒輪：設定（深色模式）
@@ -67,7 +67,7 @@
     }
     var head = el("div", { "class": "pg-head" }, [el("h1", { "class": H.LOGO ? "pg-sr" : "", text: "🎉 " + P.TITLE })]);
     if (H.LOGO) head.insertBefore(el("img", { "class": "pg-logo", src: H.LOGO, alt: P.TITLE }), head.firstChild);
-    inner.appendChild(head); inner.appendChild(scoreBox);
+    inner.appendChild(head);
 
     function unlocked() { return ctx.unlocked ? !!ctx.unlocked() : (root.PartyLock ? root.PartyLock.isUnlocked() : true); }
     // 派對解鎖（PARTY.UNLOCK_AT）之前：菜單和三個遊戲顯示「???」圖 + 小字「派對解鎖」，點了沒反應
@@ -82,7 +82,7 @@
       if (it.lock && !unlocked()) return lockedEntry(it);
       var desc = String(it.desc || "").replace("{lines}", B.CONFIG.LINES_TO_WIN), a;
       if (it.img) {                                                 // 貼紙圖片按鈕（圖片上通常已經有字）
-        a = link(ctx, it.page, "pg-entry pg-imgbtn", [el("img", { src: it.img, alt: it.title })]);
+        a = link(ctx, it.page, "pg-entry pg-imgbtn", [el("img", { src: it.img, alt: it.title }), SCORE_PAGES.indexOf(it.page) >= 0 ? el("span", { "class": "pg-score", "data-score": it.page }) : null]);
       } else {                                                      // 預設的文字方塊按鈕
         a = link(ctx, it.page, "pg-entry pg-tile", [
           el("span", { "class": "ic", text: it.icon || "" }),
@@ -93,7 +93,8 @@
       return a;
     }
     var gridEl = el("div", { "class": "pg-grid" }); inner.appendChild(gridEl);
-    function paintGrid() { gridEl.innerHTML = ""; H.BUTTONS.forEach(function (it) { gridEl.appendChild(entry(it)); }); }
+    var SCORE_PAGES = ["bingo", "quiz", "card"];
+    function paintGrid() { gridEl.innerHTML = ""; H.BUTTONS.forEach(function (it) { gridEl.appendChild(entry(it)); }); paintScore(); }
     paintGrid();
     if (H.TIP) inner.appendChild(el("p", { "class": "pg-tip", text: H.TIP }));
 
@@ -142,18 +143,17 @@
       host.appendChild(dlg);
       return dlg;
     }
+    // 自己各遊戲的分數：用半透明的黑色小圓壓在遊戲圖示上，只寫數字（不寫名次；0 分或還沒有分數就不顯示）
     function paintScore() {
-      scoreBox.innerHTML = "";
-      var pid = meId();
-      if (!pid || !latest.bingo || !latest.quiz || !root.AwardCore) return;
-      var rows = root.AwardCore.combine(latest.bingo, latest.quiz, latest.card || undefined), mine = rows.filter(function (r) { return r.pid === pid; })[0];
-      if (!mine || mine.total <= 0) return;
-      // 只寫自己各項的分數，不寫名次（名次留到頒獎才揭曉）
-      scoreBox.appendChild(el("div", { "class": "pg-scorebox" }, [
-        el("div", { "class": "t", text: "🏆 我的成績" }),
-        el("div", { "class": "n", text: "好友冰狗 " + (mine.bingo || 0) + "　迷因海公牛 " + (mine.quiz || 0) + "　陪酒小姐 " + (mine.card || 0) }),
-        el("div", { "class": "r", text: "合計 " + mine.total + " 分" })
-      ]));
+      var map = {}, pid = meId();
+      if (pid && latest.bingo && latest.quiz && root.AwardCore) {
+        var rows = root.AwardCore.combine(latest.bingo, latest.quiz, latest.card || undefined), mine = rows.filter(function (r) { return r.pid === pid; })[0];
+        if (mine) map = { bingo: mine.bingo || 0, quiz: mine.quiz || 0, card: mine.card || 0 };
+      }
+      [].forEach.call(gridEl.querySelectorAll(".pg-score"), function (n) {
+        var v = map[n.getAttribute("data-score")];
+        if (v > 0) { n.textContent = String(v); n.style.display = ""; } else { n.textContent = ""; n.style.display = "none"; }
+      });
     }
 
     var st = ctx.stores || {};

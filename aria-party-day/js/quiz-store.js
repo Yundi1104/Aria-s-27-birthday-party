@@ -3,7 +3,7 @@
  *   subscribe(cb) / onConnection(cb) / now()
  *   join(pid, name)               玩家進場
  *   answer(pid, 題號, 選項)        玩家作答（時間到之前可以一直改，以最後一次為準）
- *   setTeams(組數, { pid: 組別編號 }, 計分方式)   中控台：分組（沒被分到組的人 = 這局不玩；計分方式 'sum' | 'average' 可不寫）
+ *   setTeams(組數, { pid: 組別編號 }, 計分方式, 個人戰?)   中控台：分組（沒被分到組的人 = 這局不玩；計分方式 'sum' | 'average' 可不寫；第 4 個參數 true = 個人戰，不分組）
  *   showIntro(題號)                中控台：先放分類封面（換分類時）
  *   startQuestion(題號, 秒數)       中控台：開始這題（同時記下開始時間和秒數，倒數就是從這算；秒數 0 = 不倒數）
  *   setDuration(題號, 秒數)         中控台：作答中改秒數（加時、或不倒數的題目開始倒數）
@@ -63,7 +63,7 @@
         if (!cur || cur.choice !== choice) { state.answers[i][pid] = { choice: choice, at: Date.now() }; commit(); }     // 可以改答案，記下最後一次
         return Promise.resolve();
       },
-      setTeams: function (count, assign, mode) { state.teams = { count: count, assign: clone(assign || {}) }; if (mode) state.teams.mode = mode; commit(); return Promise.resolve(); },
+      setTeams: function (count, assign, mode, solo) { state.teams = { count: count, assign: clone(assign || {}) }; if (mode) state.teams.mode = mode; if (solo) state.teams.solo = true; commit(); return Promise.resolve(); },
       showIntro: function (i) { state.status = "intro"; state.index = i; commit(); return Promise.resolve(); },
       startQuestion: function (i, sec) {
         state.status = "question"; state.index = i; state.starts[i] = Date.now();
@@ -108,7 +108,7 @@
       });
       Object.keys(v.players || {}).forEach(function (pid) { out.players[pid] = { name: (v.players[pid] || {}).name || pid }; });
       var tv = v.teams || {};
-      out.teams.count = Number(tv.count) || 0; if (tv.mode) out.teams.mode = tv.mode;
+      out.teams.count = Number(tv.count) || 0; if (tv.mode) out.teams.mode = tv.mode; if (tv.solo) out.teams.solo = true;
       Object.keys(tv.assign || {}).forEach(function (pid) { if (tv.assign[pid] != null) out.teams.assign[pid] = tv.assign[pid]; });
       Object.keys(v.answers || {}).forEach(function (i) {
         var bag = v.answers[i]; if (!bag) return;
@@ -133,8 +133,8 @@
       answer: function (pid, i, choice) {
         return ready.then(function (h) { return h.d.set(h.d.ref(h.db, "quiz/answers/" + i + "/" + pid), { choice: choice, at: h.d.serverTimestamp() }); });
       },
-      setTeams: function (count, assign, mode) {
-        var v = { count: count, assign: assign || {} }; if (mode) v.mode = mode;
+      setTeams: function (count, assign, mode, solo) {
+        var v = { count: count, assign: assign || {} }; if (mode) v.mode = mode; if (solo) v.solo = true;
         return ready.then(function (h) { return h.d.set(h.d.ref(h.db, "quiz/teams"), v); });
       },
       showIntro: function (i) {

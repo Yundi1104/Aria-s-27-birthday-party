@@ -13,10 +13,13 @@
   function clockText(t) { var d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + "." + pad(Math.floor(d.getMilliseconds() / 10)); }
   function secLabel(s) { return Number(s) ? s + " 秒" : "不倒數"; }
 
-  // 題目的圖片 / 影片（揭曉時有答案圖就換成答案圖）
+  // 題目的圖片 / 影片：
+  //   只有圖 → 一直顯示圖（揭曉時有答案圖就換成答案圖）；只有影片 → 一直顯示影片；
+  //   圖 + 影片都有 → 出題時先放「圖」，揭曉答案時才換成「影片」
+  function useVideoNow(q, reveal) { return !!q.video && (!q.img || reveal); }
   function mediaFor(q, reveal) {
-    if (reveal && q.answerImg) return el("div", { "class": "qh-media" }, [el("img", { src: q.answerImg, alt: "答案" })]);
-    if (q.video) {
+    if (reveal && q.answerImg && !q.video) return el("div", { "class": "qh-media" }, [el("img", { src: q.answerImg, alt: "答案" })]);
+    if (q.video && useVideoNow(q, reveal)) {
       var v = K.videoEmbed(q.video), kids = [];
       if (v.kind === "video") kids.push(el("video", { src: v.src, controls: "controls", playsinline: "playsinline", preload: "auto" }));
       else if (root.QUIZ_EMBED !== false) {
@@ -49,7 +52,7 @@
     window.addEventListener("resize", fit); fit();
 
     // ---------- 上方列 ----------
-    var chip = el("span", { "class": "bh-chip" });
+    var chip = el("span", { "class": "bh-chip" }); chip.style.display = "none";                   // 狀態小標籤不顯示（內容還是會更新）
     var clock = el("span", { "class": "bh-clock" });
     var stat = el("span", { "class": "bh-stat" });
     var conn = el("span", { "class": "bh-conn" });
@@ -68,7 +71,7 @@
     if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
-        el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
+        el("div", { "class": "bh-title", text: "迷因海公牛" }),
         BC.HOST_SUBTITLE ? el("div", { "class": "bh-sub", text: BC.HOST_SUBTITLE }) : null
       ]),
       chip, clock, stat, el("span", { "class": "bh-spacer" }), controls
@@ -240,13 +243,18 @@
 
     // ---------- 分組 ----------
     function guestPids() { return B.GUESTS.map(function (g, i) { return C.guestId(i); }); }
-    function effCount() { return K.teamsOf(state).count || 4; }
+    function effCount() { return Number(state.teams && state.teams.count) || 4; }               // 真正存的組數（個人戰時 K.teamsOf 會回 1，這裡不能用）
     function scoreMode() { return K.teamsOf(state).mode || QC.TEAM_SCORE; }
-    function commitTeams(count, assign, mode) {
+    function commitTeams(count, assign, mode, solo) {
       var clean = {}; Object.keys(assign).forEach(function (pid) { var v = assign[pid]; if (v >= 0 && v < count) clean[pid] = v; });
-      store.setTeams(count, clean, mode || K.teamsOf(state).mode || undefined);
+      store.setTeams(count, clean, mode || K.teamsOf(state).mode || undefined, solo == null ? K.isSolo(state) : solo);
     }
-    function currentAssign() { var out = {}, T = K.teamsOf(state); Object.keys(T.assign).forEach(function (pid) { if (K.teamOf(state, pid) >= 0) out[pid] = K.teamOf(state, pid); }); return out; }
+    function currentAssign() {                                           // 分組的原始資料（個人戰時也保留，切回分組戰還在）
+      var out = {}, raw = (state.teams && state.teams.assign) || {}, cnt = effCount();
+      Object.keys(raw).forEach(function (pid) { var v = Number(raw[pid]); if (raw[pid] != null && raw[pid] !== "" && !isNaN(v) && v >= 0 && v < cnt) out[pid] = v; });
+      return out;
+    }
+    function setPlayMode(solo) { commitTeams(effCount(), currentAssign(), undefined, !!solo); }
     function setCount(n) { n = Math.max(1, Math.min(QC.MAX_TEAMS || 8, n)); commitTeams(n, currentAssign()); }
     function cycle(pid) {
       var cnt = effCount(), a = currentAssign(), cur = a[pid] == null ? -1 : a[pid];
@@ -277,8 +285,23 @@
         el("b", { text: String(cnt) }),
         el("button", { "class": "qh-step", type: "button", text: "＋", onclick: function () { setCount(cnt + 1); } })
       ]);
+      // 個人戰 / 分組戰：開始前隨時可以選
+      var solo = K.isSolo(state);
+      var modeSw = el("div", { "class": "qh-modesw" }, [
+        el("button", { "class": "qh-modebtn" + (!solo ? " on" : ""), type: "button", text: "👥 分組戰", onclick: function () { setPlayMode(false); } }),
+        el("button", { "class": "qh-modebtn" + (solo ? " on" : ""), type: "button", text: "🧍 個人戰", onclick: function () { setPlayMode(true); } })
+      ]);
+      if (solo) {
+        var names = B.GUESTS.map(function (g, i) { return { g: g, pid: C.guestId(i) }; }).filter(function (x) { return joined[x.pid]; });
+        left.appendChild(el("div", { "class": "qh-setup" }, [
+          el("div", { "class": "qh-setup-top" }, [el("div", { "class": "qh-setup-title", text: "🧍 個人戰" }), modeSw]),
+          el("div", { "class": "qh-hint", text: "個人戰：不用分組，所有已簽到的人都可以直接答題，各自計分；最後依個人分數排名，前幾名加分（" + (QC.TEAM_BONUS || []).join(" / ") + "）。沒簽到的人不算。" }),
+          el("div", { "class": "qh-solo-box" }, [el("div", { "class": "qh-sumtag out", text: "已簽到　" + names.length + " 人" }), el("div", { "class": "qh-roster zone" }, names.map(function (x) { return el("div", { "class": "qh-pchip in solo", style: "background:#e8f3fb;color:#2b3a4a" }, [el("span", { "class": "dot on" }), el("span", { "class": "nm", text: x.g })]); }))])
+        ]));
+        return;
+      }
       var top = el("div", { "class": "qh-setup-top" }, [
-        el("div", { "class": "qh-setup-title", text: "👥 分組" }), stepper,
+        el("div", { "class": "qh-setup-title", text: "👥 分組" }), modeSw, stepper,
         el("button", { "class": "bh-btn", type: "button", text: "🔀 隨機分組（已進場的人）", onclick: function () { randomize(true); } }),
         el("button", { "class": "bh-btn", type: "button", text: "🔀 隨機（全部）", onclick: function () { randomize(false); } }),
         el("button", { "class": "bh-btn", type: "button", text: "清除分組", onclick: function () { commitTeams(cnt, {}); } }),
@@ -320,20 +343,25 @@
         pod.appendChild(el("div", { "class": "qh-pod p" + (idx + 1) }, [
           el("div", { "class": "qh-pod-medal", text: medals[Math.min(2, tm.rank - 1)] }),
           el("div", { "class": "qh-pod-name", text: tm.icon + " " + tm.name }),
-          el("div", { "class": "qh-pod-members", text: tm.members.map(function (pid) { return K.nameOf(state, pid); }).join("、") }),
-          el("div", { "class": "qh-pod-pt", text: "答對 " + tm.correct + " 題" }),
-          el("div", { "class": "qh-pod-bonus", text: "每人 +" + tm.bonus + " 分" })
+          el("div", { "class": "qh-pod-members", text: K.isSolo(state) ? "" : tm.members.map(function (pid) { return K.nameOf(state, pid); }).join("、") }),
+          el("div", { "class": "qh-pod-pt", text: K.isSolo(state) ? "答對 " + tm.correct + " 題　共 " + tm.score + " 分" : "答對 " + tm.correct + " 題" }),
+          el("div", { "class": "qh-pod-bonus", text: (K.isSolo(state) ? "" : "每人 ") + "+" + tm.bonus + " 分" })
         ]));
       });
       left.appendChild(el("div", { "class": "qh-final" }, [
-        el("div", { "class": "qh-final-title", text: "🎉 迷因海公牛結束，組別排名揭曉！" }), pod,
+        el("div", { "class": "qh-final-title", text: K.isSolo(state) ? "🎉 迷因海公牛結束，個人排名揭曉！" : "🎉 迷因海公牛結束，組別排名揭曉！" }), pod,
         el("div", { "class": "qh-final-sub", text: BC.HOST_SUBTITLE || "" })
       ]));
     }
 
     function renderRight(board) {
       right.innerHTML = "";
-      var st = state.status, T = K.teamsOf(state), t;
+      var st = state.status, T = K.teamsOf(state), t, solo = K.isSolo(state);
+      if ((st === "lobby" || showSetup) && solo) {
+        right.appendChild(el("h2", { text: "🧍 個人戰" }));
+        right.appendChild(el("div", { "class": "qh-team-m", text: Object.keys(state.players).map(function (pid) { return K.nameOf(state, pid); }).join("、") || "（還沒有人簽到）" }));
+        return;
+      }
       if (st === "lobby" || showSetup) {
         var a = currentAssign(), un = B.GUESTS.length - Object.keys(a).length;
         right.appendChild(el("h2", { text: "👥 各組名單" }));
@@ -348,12 +376,14 @@
         right.appendChild(el("div", { "class": "qh-team-out", text: "不玩 " + un + " 人" }));
         return;
       }
-      right.appendChild(el("h2", { text: st === "ended" ? "🏆 組別排名" : "🏆 各組" }));
-      var started = state.revealed >= 0, prog = st === "question" ? K.teamProgress(state, state.index) : null, buzz = K.isBuzz(state.index);
+      right.appendChild(el("h2", { text: solo ? (st === "ended" ? "🏆 個人排名" : "🏆 個人排行") : st === "ended" ? "🏆 組別排名" : "🏆 各組" }));
+      var started = state.revealed >= 0, prog = !solo && st === "question" ? K.teamProgress(state, state.index) : null, buzz = K.isBuzz(state.index);
       var list = started || st === "ended" ? board.ranked.concat(board.teams.filter(function (x) { return x.size === 0; })) : board.teams;
+      if (solo) list = started || st === "ended" ? board.ranked.slice(0, 10) : [];                                   // 個人戰：只列前 10 名
+      if (solo && !list.length) right.appendChild(el("div", { "class": "qh-hint", text: "揭曉第一題之後，這裡會出現個人排行" }));
       list.forEach(function (tm) {
         if (tm.size === 0) return;
-        var sub = prog ? (buzz ? "已搶答 " : "已答 ") + prog[tm.team].answered + "/" + tm.size : (st === "ended" ? "每人 +" + tm.bonus + " 分" : tm.size + " 人");
+        var sub = solo ? (st === "ended" ? "+" + tm.bonus + " 分" : "答對 " + tm.correct + " 題") : prog ? (buzz ? "已搶答 " : "已答 ") + prog[tm.team].answered + "/" + tm.size : (st === "ended" ? "每人 +" + tm.bonus + " 分" : tm.size + " 人");
         var row = el("div", { "class": "qh-trow" + (started && tm.rank <= 3 ? " top" : "") }, [
           el("span", { "class": "qh-rk r" + (started ? Math.min(tm.rank, 4) : 0), text: started ? String(tm.rank) : tm.icon }),
           el("div", { "class": "mid" }, [el("div", { "class": "nm", text: tm.icon + " " + tm.name }), el("div", { "class": "sub", text: sub })]),
@@ -377,7 +407,7 @@
         var ok = K.assignedPids(state).filter(function (pid) { return K.isCorrect(state, state.index, pid); }).length;
         stat.textContent = buzz ? "判定答對 " + ok + " 人" : "答對 " + ok + " / " + playing + " 人";
       } else if (st === "intro") stat.textContent = "";
-      else stat.textContent = "已分組 " + playing + " 人 · " + (K.teamsOf(state).count || 0) + " 組 · 已進場 " + joined + "/" + B.GUESTS.length;
+      else stat.textContent = K.isSolo(state) ? "個人戰 · 已簽到 " + joined + "/" + B.GUESTS.length : "已分組 " + playing + " 人 · " + (K.teamsOf(state).count || 0) + " 組 · 已進場 " + joined + "/" + B.GUESTS.length;
 
       // 秒數：出題前選（每換一題就回到那題的預設值）
       var willStart = nextQ >= 0 && (st === "intro" || ((st === "lobby" || st === "reveal") && !(QC.CATEGORY_INTRO !== false && K.isCatStart(nextQ))));
@@ -414,7 +444,7 @@
       else if (st === "ended") { var k = "ended:" + board.ranked.slice(0, 3).map(function (r) { return r.team + ":" + r.correct; }).join(","); if (leftKey !== k) { buildPodium(board); leftKey = k; } }
       else if (st === "intro") { var ik = "intro" + state.index; if (leftKey !== ik) { buildIntro(); leftKey = ik; } }
       else if (q) {
-        var qk = "q" + state.index + (st === "reveal" && q.answerImg ? ":ans" : "");      // 有答案圖時，揭曉才換畫面（影片不會被重開）
+        var qk = "q" + state.index + (st === "reveal" && (q.answerImg || (q.video && q.img)) ? ":ans" : "");      // 有答案圖時，揭曉才換畫面（影片不會被重開）
         if (leftKey !== qk) { buildQuestion(); leftKey = qk; }
         paintQuestion();
       }

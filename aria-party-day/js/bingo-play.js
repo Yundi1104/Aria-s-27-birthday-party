@@ -149,7 +149,7 @@
     }
 
     // ---------- 教學（第一次進來自動播放；上面「教學」可以重看）----------
-    // 手指把「Aria」拖到「壽星是誰」→ 放開變黃色發光 → 半透明遮罩上出現說明文字；按「確定」關掉、按「重看教學」重播
+    // 手指把「Aria」拖到「瘦星是誰」→ 放開變黃色發光 → 半透明遮罩上出現說明文字；按「確定」關掉、按「重看教學」重播
     var TUT_KEY = "ariaBingo.tut.";
     function tutSeen() {
       if (root.__bingoTutSeen && root.__bingoTutSeen[me]) return true;
@@ -173,12 +173,12 @@
       // 教學是「他自己」專屬的：把他自己的名字拖到他自己的那一格（答案就是他的那題）
       var gi = C.guestIndex(me), myName = gi >= 0 ? D.GUESTS[gi] : "Aria", own = C.ownCell(me);
       var others = [1, 2].map(function (k) { return D.GUESTS[(gi + k) % D.GUESTS.length]; });
-      var cellN = el("div", { "class": "tut-cell" }, [el("span", { "class": "q", text: own ? C.qText(own.q) : "壽星是誰" })]);
+      var cellN = el("div", { "class": "tut-cell" }, [el("span", { "class": "q", text: own ? C.qText(own.q) : "瘦星是誰" })]);
       var chips = [myName, others[0], others[1]].map(function (n, i) { return el("span", { "class": "tut-chip c" + (i + 1), text: n }); });
       var ghost = el("span", { "class": "tut-ghost", text: myName });
       var finger = el("span", { "class": "tut-finger", text: "👆" });
       var stage = el("div", { "class": "tut-stage" }, [cellN].concat(chips, [ghost, finger]));
-      var qtxt = own ? C.qText(own.q) : "", byName = (CFG.TUTORIAL_OWN_BY_NAME || {})[myName];       // 「你是 + 題目」（壽星特別寫成「你是壽星」）
+      var qtxt = own ? C.qText(own.q) : "", byName = (CFG.TUTORIAL_OWN_BY_NAME || {})[myName];       // 「你是 + 題目」（瘦星特別寫成「你是瘦星」）
       var capLines = byName ? [byName] : (CFG.TUTORIAL_OWN || ["你是{q}"]).map(function (t) { return String(t).replace("{q}", qtxt).replace("{name}", myName); });
       var cap = el("div", { "class": "tut-cap" }, [el("div", { "class": "big", text: capLines[0] }), capLines[1] ? el("div", { "class": "sm", text: capLines[1] }) : null]);
       var msg = el("div", { "class": "tut-msg" }, [

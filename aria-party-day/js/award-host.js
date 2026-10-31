@@ -31,7 +31,7 @@
     window.addEventListener("resize", fit); fit();
 
     // ---------- 上方列 ----------
-    var chip = el("span", { "class": "bh-chip", text: "頒獎" });
+    var chip = el("span", { "class": "bh-chip", text: "頒獎" }); chip.style.display = "none";     // 標題已經寫「頒獎」，不需要再多一個標籤
     var src = el("span", { "class": "bh-stat" });
     var btnMain = el("button", { "class": "bh-btn primary", type: "button", onclick: onMain });
     var btnPeek = el("button", { "class": "bh-btn", type: "button", text: "👀 偷看排名（會劇透）", onclick: function () { goPeek(true); } });
@@ -41,7 +41,7 @@
     if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
-        el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
+        el("div", { "class": "bh-title", text: "頒獎" }),
         BC.HOST_SUBTITLE ? el("div", { "class": "bh-sub", text: BC.HOST_SUBTITLE }) : null
       ]),
       chip, el("span", { "class": "bh-spacer" }), controls

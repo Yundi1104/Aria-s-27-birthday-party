@@ -8,7 +8,7 @@
  *   level     難度（易 / 中 / 難），只是顯示用
  *   type      "choice" = 選擇題（預設）；"buzz" = 搶答題（手機只有一顆搶答鈕，中控台看按下的順序和時間，主持人判定誰答對）
  *   q         題目文字
- *   img       題目圖片（放在 images/quiz/；GIF 也可以）
+ *   img       題目圖片（和 video 同時有的時候：出題先放圖，揭曉答案才換成影片；手機上一直看得到圖）（放在 images/quiz/；GIF 也可以）
  *   video     影片：YouTube / bilibili 網址，或自己的影片檔（例如 "images/quiz/q01.mp4"）。只會在中控台（大螢幕）播放，有聲音
  *   answerImg 揭曉答案時換上的圖片（可不寫）
  *   options   選項（2 ~ 4 個）。搶答題不用寫
@@ -52,9 +52,9 @@
     QUESTIONS: [
 
       // ---------- 暖身 ----------
-      { no: 1, cat: "暖身", level: "易", q: "圖片主持人說了什麼", video: "https://www.youtube.com/watch?v=TZzRTTeJ80g", options: ["海公豬", "海公雞", "海公牛", "海公鴨"], answer: 2 },
-      { no: 2, cat: "暖身", level: "易", type: "buzz", q: "下一句台詞是什麼？", img: "images/quiz/q02.jpg", answerImg: "images/quiz/q02-answer.jpg",
-        video: "https://youtu.be/lFAvcZz_aLE?t=94", answerText: "讓拓也捐" },     // 出題時大螢幕播影片（從 1:34 開始），手機看圖片；揭曉時換成答案圖
+      { no: 1, cat: "暖身", level: "易", q: "圖片主持人說了什麼", img: "images/quiz/q01.jpg", video: "https://www.youtube.com/watch?v=TZzRTTeJ80g", options: ["海公豬", "海公雞", "海公牛", "海公鴨"], answer: 2 },
+      { no: 2, cat: "暖身", level: "易", type: "buzz", q: "下一句台詞是什麼？", img: "images/quiz/q02.jpg",
+        video: "https://youtu.be/lFAvcZz_aLE?t=94", answerText: "讓拓也捐" },     // 出題時大螢幕和手機都先看圖片；揭曉答案時大螢幕才播影片（從 1:34 開始）
 
       // ---------- 紫禁城（甄嬛傳） ----------
       { no: 3, cat: "紫禁城", level: "易", q: "這一段甄嬛對皇上死心，是因為哪一句？", img: "images/quiz/q06.jpg", options: ["賤人就是矯情", "翠果，打爛她的嘴", "人吃五穀雜糧，哪有不生病", "菀菀類卿"], answer: 3 },
@@ -70,11 +70,11 @@
 
       // ---------- 真珠皮亞利（真珠美人魚） ----------
       { no: 9, cat: "真珠皮亞利", level: "易", q: "露亞等美人魚公主積極找齊散落在各地的七位美人魚公主，其最主要的目的是什麼？", img: "images/quiz/q14.jpg", options: ["召喚阿克安雷之娜女神", "和海斗生小寶寶", "尋找自己遺失的粉色真珠", "對付壞婊子米兒"], answer: 0 },
-      { no: 10, cat: "真珠皮亞利", level: "中", type: "buzz", q: "下一句歌詞是什麼？", answerText: "（答案待補）" },
+      { no: 10, cat: "真珠皮亞利", level: "中", type: "buzz", q: "下一句歌詞是什麼？", img: "images/quiz/q10.jpg", video: "https://youtu.be/wWKbvdRcivQ?t=66", answerText: "（答案請看影片）" },
 
       // ---------- 比奇堡（海綿寶寶） ----------
       { no: 11, cat: "比奇堡", level: "難", q: "蟹堡王的創辦人兼老闆「蟹老闆」，他在營業執照上的全名（本名）叫做什麼？", options: ["厚理·蟹", "尤金·蟹", "亞瑟·蟹", "謝爾頓·蟹"], answer: 1 },
-      { no: 12, cat: "比奇堡", level: "中", q: "這是弗雷德，他在比奇堡內最常喊的經典台詞是？", video: "https://www.bilibili.com/video/BV1be411s7cJ/", options: ["我的腿！", "海綿寶寶！", "你們要倒大楣了！", "老兄，你要習慣"], answer: 0 }
+      { no: 12, cat: "比奇堡", level: "中", q: "這是弗雷德，他在比奇堡內最常喊的經典台詞是？", img: "images/quiz/q12.jpg", video: "https://www.bilibili.com/video/BV1be411s7cJ/", options: ["我的腿！", "海綿寶寶！", "你們要倒大楣了！", "老兄，你要習慣"], answer: 0 }
     ]
   };
 

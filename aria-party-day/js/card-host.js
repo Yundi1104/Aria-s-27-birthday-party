@@ -43,7 +43,7 @@
     window.addEventListener("resize", fit); fit();
 
     // ---------- 上方列 ----------
-    var chip = el("span", { "class": "bh-chip" });
+    var chip = el("span", { "class": "bh-chip" }); chip.style.display = "none";                   // 狀態小標籤不顯示（內容還是會更新）
     var stat = el("span", { "class": "bh-stat" });
     var conn = el("span", { "class": "bh-conn" });
     var btnStart = el("button", { "class": "bh-btn primary", type: "button", text: "開始遊戲", onclick: onStart });
@@ -51,11 +51,11 @@
     var btnReset = el("button", { "class": "bh-btn danger", type: "button", text: "重置", onclick: onReset });
     var btnFree = el("button", { "class": "bh-btn", type: "button", onclick: function () { store.setFree(!state.free); } });   // 手機切換：主遊戲 ⇄ 自由開局（不計分）
     var controls = el("div", { "class": "bh-controls" }, [btnFree, btnStart, btnEnd, btnReset]);
-    // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來；按 H 把按鈕藏起來時它也會藏起來
+    // 「‹ 中控台」：回到主持人入口（host-index.html）。由頁面傳 backHref 進來
     if (opts && opts.backHref) controls.insertBefore(el("a", { "class": "bh-btn bh-back", href: opts.backHref, text: "‹ 中控台" }), controls.firstChild);
     stage.appendChild(el("div", { "class": "bh-header" }, [
       el("div", { "class": "bh-titlebox" }, [
-        el("div", { "class": "bh-title", text: BC.HOST_TITLE || "派對" }),
+        el("div", { "class": "bh-title", text: "陪酒小姐" }),
         el("div", { "class": "bh-sub", text: CD.CONFIG.HOST_SUBTITLE || "" })
       ]),
       chip, stat, el("span", { "class": "bh-spacer" }), conn, controls
@@ -70,11 +70,6 @@
       else { disarm(); makePlan(); store.reset(); }
     }
     function disarm() { armed = false; clearTimeout(armTimer); btnReset.textContent = "重置"; btnReset.classList.remove("armed"); }
-    document.addEventListener("keydown", function (e) {
-      var t = e.target && e.target.tagName;
-      if (t === "INPUT" || t === "TEXTAREA") return;
-      if (e.key === "h" || e.key === "H") stage.classList.toggle("hide-ctl");
-    });
 
     var main = el("div", { "class": "ch-main" });
     stage.appendChild(main);
@@ -266,8 +261,7 @@
       btnFree.textContent = state.free ? "手機：自由開局 ⇄ 切回主遊戲" : "切換成自由開局";
       btnFree.classList.toggle("on", !!state.free);
       if (state.free) chip.textContent = "自由開局中（不計分）";
-      var base = "按 H 可隱藏按鈕";
-      conn.textContent = store.mode === "local" ? "🟡 本機測試模式　" + base : store.mode === "firebase" ? (connected ? "🟢 已連線　" : "🔴 連線中斷　") + base : base;
+      conn.textContent = store.mode === "local" ? "🟡 本機測試模式" : store.mode === "firebase" ? (connected ? "🟢 已連線" : "🔴 連線中斷") : "";
       if (st === "lobby") renderSetup(); else renderTables();
     }
 

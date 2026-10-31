@@ -23,10 +23,11 @@
 *{box-sizing:border-box;}
 /* 連點 / 狂按不會觸發「點兩下放大」（雙指縮放照常可以）；搶答鈕還另外鎖了文字選取和長按選單 */
 html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-html{background:var(--blue-light) url(../images/background-tile.jpg) center top/100% auto repeat-y;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
-html,body{margin:0;padding:0;height:100%;color:var(--ink);background:var(--blue-light);
+html,body{margin:0;padding:0;height:100%;color:var(--ink);background-color:var(--blue-light);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
   -webkit-tap-highlight-color:transparent;}
+html{background:var(--blue-light) url(../images/background-tile.jpg) center top/100% auto repeat-y;}                 /* 整張畫布也鋪背景圖：往下拉回彈、網址列收合露出來的地方不會變成單色 */
+body{background:transparent;}
 button{font-family:inherit;}
 
 /* ===================== 玩家端 ===================== */
@@ -193,7 +194,7 @@ a.bh-btn{text-decoration:none;display:inline-flex;align-items:center;white-space
 .bh-conn{font-size:13px;font-weight:700;}
 
 .bh-main{position:absolute;left:20px;right:20px;top:80px;bottom:16px;display:flex;gap:18px;}
-.bh-grid{flex:0 0 880px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:9px;}
+.bh-grid{flex:0 0 880px;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(3,1fr);gap:9px;}       /* 21 位 = 7 × 3；每一張小卡都完整顯示 5×5 的格子（以前 5 欄 × 4 列會把最下面一排切掉） */
 .bh-card{position:relative;background:#fff;border-radius:14px;border:3px solid transparent;padding:7px 8px 8px;
   display:flex;flex-direction:column;align-items:center;cursor:pointer;box-shadow:0 2px 0 var(--blue-shadow);overflow:hidden;}
 .bh-card.empty{background:rgba(255,255,255,.45);box-shadow:none;cursor:default;}
@@ -206,7 +207,7 @@ a.bh-btn{text-decoration:none;display:inline-flex;align-items:center;white-space
 .bh-badge.n2{background:var(--yellow-light);color:var(--gold-text);}
 .bh-badge.n3{background:var(--orange);color:var(--ink);}
 .bh-badge.rank{background:var(--ink);color:var(--yellow);}
-.bh-mini{display:grid;grid-template-columns:repeat(5,19px);grid-auto-rows:19px;gap:2px;}
+.bh-mini{display:grid;grid-template-columns:repeat(5,18px);grid-auto-rows:18px;gap:2px;}
 .bh-cell{border-radius:4px;background:var(--mini-empty);}
 .bh-cell.on{background:var(--yellow);}
 .bh-cell.line{background:var(--orange);}
@@ -285,7 +286,7 @@ a.bh-btn{text-decoration:none;display:inline-flex;align-items:center;white-space
 /* 「用點的」題目右下角的小手指 */
 .bp-tap{position:absolute;right:3px;bottom:1px;font-size:13px;line-height:1;pointer-events:none;}
 
-/* 第一次進來的教學：半透明遮罩 + 手指把 Aria 拖到「壽星是誰」 */
+/* 第一次進來的教學：半透明遮罩 + 手指把 Aria 拖到「瘦星是誰」 */
 .bp-tut{position:absolute;inset:0;z-index:50;background:rgba(43,58,74,.82);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:14px;overflow-y:auto;animation:tutIn .3s ease-out;}
 .bp-tut::before,.bp-tut::after{content:"";flex:1 0 0;}                      /* 空間夠就置中；螢幕比較矮時可以往下滑，不會被切掉 */
 @media (max-height:700px){.tut-stage{transform:scale(.82);margin:-20px 0;}}

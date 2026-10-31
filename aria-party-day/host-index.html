@@ -8,20 +8,9 @@
 <link rel="stylesheet" href="css/party.css">
 </head>
 <body>
-<!-- 密碼畫面：在這裡輸入一次密碼，四個中控台就都不會再問了（密碼在 js/bingo-data.js 的 HOST_PIN） -->
-<div class="hi-gate" id="hiGate">
-  <form class="hi-gate-card" id="hiForm">
-    <div class="em">🎛️</div>
-    <h2>主持人入口</h2>
-    <input id="hiPin" type="password" inputmode="text" autocomplete="off" placeholder="輸入密碼">
-    <div class="err" id="hiErr"></div>
-    <button class="hi-btn" type="submit">進入</button>
-    <a class="hi-back" href="index.html">‹ 回賓客入口</a>
-  </form>
-</div>
-<div class="hi-wrap" id="hiContent" style="display:none">
+<div class="hi-wrap" id="hiContent">
   <h1>🎛️ 主持人入口</h1>
-  <p class="s">派對當天的各個中控台（接電腦投影）。<b>密碼只要在這裡輸入一次</b>，四個中控台就不會再問了（這台電腦 12 小時內有效）。賓客用的入口頁是 <b>index.html</b>。</p>
+  <p class="s">派對當天的各個中控台（接電腦投影）。中控台<b>不需要密碼</b>（只有妳會用到這幾頁，網址請不要給賓客）。賓客用的入口頁是 <b>index.html</b>。</p>
 
   <div class="hi-sec">照時程表的順序</div>
   <a class="hi-link" href="host.html"><span class="t">🎯 好友冰狗<small>18:00 ~ 19:00　開始遊戲 / 看每個人的盤面</small></span><span class="tm">18:00</span></a>
@@ -56,18 +45,8 @@
 <script src="js/card-data.js"></script>
 <script src="js/card-core.js"></script>
 <script src="js/card-store.js"></script>
-<script src="js/host-auth.js"></script>
 <script>
   (function () {
-    var gate = document.getElementById("hiGate"), content = document.getElementById("hiContent");
-    function open() { gate.style.display = "none"; content.style.display = ""; }
-    if (HostAuth.ok()) open();
-    document.getElementById("hiForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (document.getElementById("hiPin").value === BINGO_DATA.CONFIG.HOST_PIN) { HostAuth.set(); open(); }
-      else document.getElementById("hiErr").textContent = "密碼不對";
-    });
-
     // ---- 一鍵重置全部（按兩次才會做）----
     var btn = document.getElementById("resetAll"), msg = document.getElementById("resetMsg"), armed = false, timer = null;
     function disarm() { armed = false; clearTimeout(timer); btn.textContent = "🧹 重置全部"; btn.classList.remove("armed"); }

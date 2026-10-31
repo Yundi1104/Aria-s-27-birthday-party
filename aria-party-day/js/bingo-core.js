@@ -163,7 +163,7 @@
     return optionNames().filter(function (g) { return !used[g]; });
   }
 
-  // 下方人名選項：全部賓客，扣掉不要出現的人（壽星本人）
+  // 下方人名選項：全部賓客，扣掉不要出現的人（瘦星本人）
   function optionNames() {
     var hide = D().CONFIG.HIDE_FROM_OPTIONS || [];
     return D().GUESTS.filter(function (g) { return hide.indexOf(g) < 0; });

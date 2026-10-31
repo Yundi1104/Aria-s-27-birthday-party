@@ -120,7 +120,7 @@ html,body{height:auto;min-height:100%;}
 .pg-logo{display:block;width:82%;max-width:380px;margin:2px auto 6px;}
 .pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;}
 .pg-grid .pg-tile{grid-column:1 / -1;}
-.pg-imgbtn{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--ink);-webkit-tap-highlight-color:transparent;}
+.pg-imgbtn{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--ink);-webkit-tap-highlight-color:transparent;}
 .pg-imgbtn img{display:block;width:80%;max-width:184px;height:auto;filter:drop-shadow(0 4px 0 rgba(43,58,74,.16));transition:transform .15s ease;}
 .pg-imgbtn:active img{transform:scale(.95) rotate(-1.5deg);}
 
@@ -171,3 +171,6 @@ html,body{height:auto;min-height:100%;}
 .hi-reset p{margin:0 0 10px;font-size:14px;line-height:1.6;}
 .hi-msg{margin-top:10px;font-size:14px;font-weight:700;line-height:1.6;}
 .hi-msg.good{color:var(--ok);} .hi-msg.bad{color:var(--danger);}
+
+/* 主畫面：自己的分數（半透明黑色圓，壓在遊戲圖示上，只寫數字） */
+.pg-score{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);min-width:54px;box-sizing:border-box;text-align:center;padding:5px 14px;border-radius:99px;background:rgba(0,0,0,.58);color:#fff;font-size:26px;line-height:1.15;font-weight:900;letter-spacing:1px;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.4);}
